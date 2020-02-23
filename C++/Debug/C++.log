@@ -1,0 +1,5 @@
+﻿  getShareData.c
+E:\project\Rh\C++\getShareData.c(12,6): warning C4101:  “i”: 未引用的局部变量
+E:\project\Rh\C++\getShareData.c(85,7): warning C4101:  “ch”: 未引用的局部变量
+E:\project\Rh\C++\getShareData.c(43): warning C4716:  “closeMem”: 必须返回一个值
+  C++.vcxproj -> E:\project\Rh\C++\Debug\C++.exe
