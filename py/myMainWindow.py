@@ -19,22 +19,14 @@ from GetDataFromShareMem import getShareMemData   # .so为底层
 #from myFigureCanvas import QmyFigureCanvas
 from dataStack import queue
 from buttonFunc import buttonFunc
-
+from  ledFunc import ledFunc
 
 
 orderDict = {
-   'allLedOff':0,
-   'takeOffLed':1,
-   'landingLed':2,
-   'keepHeightLed':9,
-   'climb1Led':3,
-   'climb2Led':5,
-   'decline1Led':4,
-   'decline2Led':6,
-   'turnLeftLed':7,
-   'turnRightLed':8,
-   'keepDirectLed':10,
-   'programeControlLed':11,
+   'allLedOff':0, 'takeOffLed':1, 'landingLed':2,
+   'keepHeightLed':9, 'climb1Led':3, 'climb2Led':5,
+   'decline1Led':4, 'decline2Led':6, 'turnLeftLed':7,
+   'turnRightLed':8, 'keepDirectLed':10, 'programeControlLed':11,
    'stopLed':12
 }
 
@@ -52,6 +44,8 @@ class QmyMainWindow(QMainWindow):
       self.__buildUI()
       ## ==================按钮功能类初始化==================
       self.buttonFunction = buttonFunc(self)
+      ## ================互斥灯============================
+      self.ledFunction = ledFunc(self)
       ## ==================打开共享内存模块=================
       self.ret = -1   # 打开共享内存标志位，若为0，则打开成功，若为-1 -2 则失败，一般读取内存中数据之前都要判断一下
 
@@ -118,7 +112,7 @@ class QmyMainWindow(QMainWindow):
 
       ## ================指示灯模块初始化=====================
       self.LedState = 0
-      self.LedProgrameControlState = 0
+      self.LedProgrameControlState = 0        ## 程控灯的状态为灭的
       self.programeControlLed_clicked = False
       self.readData_UpFigure_UpState()
       self.LedTimer = QTimer()
@@ -130,10 +124,10 @@ class QmyMainWindow(QMainWindow):
 
    # ===================状态栏============================
    def __buildUI(self):
-      self.__LabAircraftInfo = QLabel(self)
-      self.__LabAircraftInfo.setMinimumWidth(300)
-      self.__LabAircraftInfo.setText("当前飞机状态：")
-      self.ui.statusbar.addWidget(self.__LabAircraftInfo)
+      self.LabAircraftInfo = QLabel(self)
+      self.LabAircraftInfo.setMinimumWidth(300)
+      self.LabAircraftInfo.setText("当前飞机状态：")
+      self.ui.statusbar.addWidget(self.LabAircraftInfo)
       
       self.__LabInfo = QLabel(self)
       self.__LabInfo.setMinimumWidth(300)
@@ -324,305 +318,54 @@ class QmyMainWindow(QMainWindow):
 ## ==============自定义函数===============================
    # 设置指示灯的互斥，某一瞬间只有一个亮的
    def ledStateMutex(self,clickled):
+      
       if clickled == "takeOffLed":
-         self.__LabAircraftInfo.setText("当前飞机状态：起飞")
-         self.ui.takeOffLed.state = 'on'
-         self.ui.takeOffLed.repaint()
-         self.ui.landingLed.state = 'off'
-         self.ui.landingLed.repaint()
-         self.ui.keepHeightLed.state = 'off'
-         self.ui.keepHeightLed.repaint()
-         self.ui.climb1Led.state = 'off'
-         self.ui.climb1Led.repaint()
-         self.ui.climb2Led.state = 'off'
-         self.ui.climb2Led.repaint()
-         self.ui.decline1Led.state = 'off'
-         self.ui.decline1Led.repaint()
-         self.ui.decline2Led.state = 'off'
-         self.ui.decline2Led.repaint()
-         self.ui.turnLeftLed.state = 'off'
-         self.ui.turnLeftLed.repaint()
-         self.ui.turnRightLed.state = 'off'
-         self.ui.turnRightLed.repaint()
-         self.ui.keepDirectLed.state = 'off'
-         self.ui.keepDirectLed.repaint()
-         self.ui.stopLed.state = 'off'
-         self.ui.stopLed.repaint()
+         self.LabAircraftInfo.setText("当前飞机状态：起飞")
+         self.ledFunction.takeOffLed("takeOffLed")
 
       elif clickled == "landingLed":
-         self.__LabAircraftInfo.setText("当前飞机状态：着陆")
-         self.ui.takeOffLed.state = 'off'
-         self.ui.takeOffLed.repaint()
-         self.ui.landingLed.state = 'on'
-         self.ui.landingLed.repaint()
-         self.ui.keepHeightLed.state = 'off'
-         self.ui.keepHeightLed.repaint()
-         self.ui.climb1Led.state = 'off'
-         self.ui.climb1Led.repaint()
-         self.ui.climb2Led.state = 'off'
-         self.ui.climb2Led.repaint()
-         self.ui.decline1Led.state = 'off'
-         self.ui.decline1Led.repaint()
-         self.ui.decline2Led.state = 'off'
-         self.ui.decline2Led.repaint()
-         self.ui.turnLeftLed.state = 'off'
-         self.ui.turnLeftLed.repaint()
-         self.ui.turnRightLed.state = 'off'
-         self.ui.turnRightLed.repaint()
-         self.ui.keepDirectLed.state = 'off'
-         self.ui.keepDirectLed.repaint()
-         self.ui.stopLed.state = 'off'
-         self.ui.stopLed.repaint()
+         self.LabAircraftInfo.setText("当前飞机状态：着陆")
+         self.ledFunction.takeOffLed("landingLed")
 
       elif clickled == "keepHeightLed":
-         self.__LabAircraftInfo.setText("当前飞机状态：定高飞行")
-         self.ui.takeOffLed.state = 'off'
-         self.ui.takeOffLed.repaint()
-         self.ui.landingLed.state = 'off'
-         self.ui.landingLed.repaint()
-         self.ui.keepHeightLed.state = 'on'
-         self.ui.keepHeightLed.repaint()
-         self.ui.climb1Led.state = 'off'
-         self.ui.climb1Led.repaint()
-         self.ui.climb2Led.state = 'off'
-         self.ui.climb2Led.repaint()
-         self.ui.decline1Led.state = 'off'
-         self.ui.decline1Led.repaint()
-         self.ui.decline2Led.state = 'off'
-         self.ui.decline2Led.repaint()
-         self.ui.turnLeftLed.state = 'off'
-         self.ui.turnLeftLed.repaint()
-         self.ui.turnRightLed.state = 'off'
-         self.ui.turnRightLed.repaint()
-         self.ui.keepDirectLed.state = 'off'
-         self.ui.keepDirectLed.repaint()
-         self.ui.stopLed.state = 'off'
-         self.ui.stopLed.repaint()
+         self.LabAircraftInfo.setText("当前飞机状态：定高飞行")
+         self.ledFunction.takeOffLed("keepHeightLed")
  
       elif clickled == "climb1Led":
-         self.__LabAircraftInfo.setText("当前飞机状态：爬升1")
-         self.ui.takeOffLed.state = 'off'
-         self.ui.takeOffLed.repaint()
-         self.ui.landingLed.state = 'off'
-         self.ui.landingLed.repaint()
-         self.ui.keepHeightLed.state = 'off'
-         self.ui.keepHeightLed.repaint()
-         self.ui.climb1Led.state = 'on'
-         self.ui.climb1Led.repaint()
-         self.ui.climb2Led.state = 'off'
-         self.ui.climb2Led.repaint()
-         self.ui.decline1Led.state = 'off'
-         self.ui.decline1Led.repaint()
-         self.ui.decline2Led.state = 'off'
-         self.ui.decline2Led.repaint()
-         self.ui.turnLeftLed.state = 'off'
-         self.ui.turnLeftLed.repaint()
-         self.ui.turnRightLed.state = 'off'
-         self.ui.turnRightLed.repaint()
-         self.ui.keepDirectLed.state = 'off'
-         self.ui.keepDirectLed.repaint()
-         self.ui.stopLed.state = 'off'
-         self.ui.stopLed.repaint()
+         self.LabAircraftInfo.setText("当前飞机状态：爬升1")
+         self.ledFunction.takeOffLed("climb1Led")
 
       elif clickled == "climb2Led":
-         self.__LabAircraftInfo.setText("当前飞机状态：爬升2")
-         self.ui.takeOffLed.state = 'off'
-         self.ui.takeOffLed.repaint()
-         self.ui.landingLed.state = 'off'
-         self.ui.landingLed.repaint()
-         self.ui.keepHeightLed.state = 'off'
-         self.ui.keepHeightLed.repaint()
-         self.ui.climb1Led.state = 'off'
-         self.ui.climb1Led.repaint()
-         self.ui.climb2Led.state = 'on'
-         self.ui.climb2Led.repaint()
-         self.ui.decline1Led.state = 'off'
-         self.ui.decline1Led.repaint()
-         self.ui.decline2Led.state = 'off'
-         self.ui.decline2Led.repaint()
-         self.ui.turnLeftLed.state = 'off'
-         self.ui.turnLeftLed.repaint()
-         self.ui.turnRightLed.state = 'off'
-         self.ui.turnRightLed.repaint()
-         self.ui.keepDirectLed.state = 'off'
-         self.ui.keepDirectLed.repaint()
-         self.ui.stopLed.state = 'off'
-         self.ui.stopLed.repaint()
+         self.LabAircraftInfo.setText("当前飞机状态：爬升2")
+         self.ledFunction.takeOffLed("climb2Led")
 
       elif clickled == "decline1Led":
-         self.__LabAircraftInfo.setText("当前飞机状态：下滑1")
-         self.ui.takeOffLed.state = 'off'
-         self.ui.takeOffLed.repaint()
-         self.ui.landingLed.state = 'off'
-         self.ui.landingLed.repaint()
-         self.ui.keepHeightLed.state = 'off'
-         self.ui.keepHeightLed.repaint()
-         self.ui.climb1Led.state = 'off'
-         self.ui.climb1Led.repaint()
-         self.ui.climb2Led.state = 'off'
-         self.ui.climb2Led.repaint()
-         self.ui.decline1Led.state = 'on'
-         self.ui.decline1Led.repaint()
-         self.ui.decline2Led.state = 'off'
-         self.ui.decline2Led.repaint()
-         self.ui.turnLeftLed.state = 'off'
-         self.ui.turnLeftLed.repaint()
-         self.ui.turnRightLed.state = 'off'
-         self.ui.turnRightLed.repaint()
-         self.ui.keepDirectLed.state = 'off'
-         self.ui.keepDirectLed.repaint()
-         self.ui.stopLed.state = 'off'
-         self.ui.stopLed.repaint()
+         self.LabAircraftInfo.setText("当前飞机状态：下滑1")
+         self.ledFunction.takeOffLed("decline1Led")
 
       elif clickled == "decline2Led":
-         self.__LabAircraftInfo.setText("当前飞机状态：下滑2")
-         self.ui.takeOffLed.state = 'off'
-         self.ui.takeOffLed.repaint()
-         self.ui.landingLed.state = 'off'
-         self.ui.landingLed.repaint()
-         self.ui.keepHeightLed.state = 'off'
-         self.ui.keepHeightLed.repaint()
-         self.ui.climb1Led.state = 'off'
-         self.ui.climb1Led.repaint()
-         self.ui.climb2Led.state = 'off'
-         self.ui.climb2Led.repaint()
-         self.ui.decline1Led.state = 'off'
-         self.ui.decline1Led.repaint()
-         self.ui.decline2Led.state = 'on'
-         self.ui.decline2Led.repaint()
-         self.ui.turnLeftLed.state = 'off'
-         self.ui.turnLeftLed.repaint()
-         self.ui.turnRightLed.state = 'off'
-         self.ui.turnRightLed.repaint()
-         self.ui.keepDirectLed.state = 'off'
-         self.ui.keepDirectLed.repaint()
-         self.ui.stopLed.state = 'off'
-         self.ui.stopLed.repaint()
+         self.LabAircraftInfo.setText("当前飞机状态：下滑2")
+         self.ledFunction.takeOffLed("decline2Led")
 
       elif clickled == "turnLeftLed":
-         self.__LabAircraftInfo.setText("当前飞机状态：左转")
-         self.ui.takeOffLed.state = 'off'
-         self.ui.takeOffLed.repaint()
-         self.ui.landingLed.state = 'off'
-         self.ui.landingLed.repaint()
-         self.ui.keepHeightLed.state = 'off'
-         self.ui.keepHeightLed.repaint()
-         self.ui.climb1Led.state = 'off'
-         self.ui.climb1Led.repaint()
-         self.ui.climb2Led.state = 'off'
-         self.ui.climb2Led.repaint()
-         self.ui.decline1Led.state = 'off'
-         self.ui.decline1Led.repaint()
-         self.ui.decline2Led.state = 'off'
-         self.ui.decline2Led.repaint()
-         self.ui.turnLeftLed.state = 'on'
-         self.ui.turnLeftLed.repaint()
-         self.ui.turnRightLed.state = 'off'
-         self.ui.turnRightLed.repaint()
-         self.ui.keepDirectLed.state = 'off'
-         self.ui.keepDirectLed.repaint()
-         self.ui.stopLed.state = 'off'
-         self.ui.stopLed.repaint()
+         self.LabAircraftInfo.setText("当前飞机状态：左转")
+         self.ledFunction.takeOffLed("turnLeftLed")
 
       elif clickled == "turnRightLed":
-         self.__LabAircraftInfo.setText("当前飞机状态：右转")
-         self.ui.takeOffLed.state = 'off'
-         self.ui.takeOffLed.repaint()
-         self.ui.landingLed.state = 'off'
-         self.ui.landingLed.repaint()
-         self.ui.keepHeightLed.state = 'off'
-         self.ui.keepHeightLed.repaint()
-         self.ui.climb1Led.state = 'off'
-         self.ui.climb1Led.repaint()
-         self.ui.climb2Led.state = 'off'
-         self.ui.climb2Led.repaint()
-         self.ui.decline1Led.state = 'off'
-         self.ui.decline1Led.repaint()
-         self.ui.decline2Led.state = 'off'
-         self.ui.decline2Led.repaint()
-         self.ui.turnLeftLed.state = 'off'
-         self.ui.turnLeftLed.repaint()
-         self.ui.turnRightLed.state = 'on'
-         self.ui.turnRightLed.repaint()
-         self.ui.keepDirectLed.state = 'off'
-         self.ui.keepDirectLed.repaint()
-         self.ui.stopLed.state = 'off'
-         self.ui.stopLed.repaint()
+         self.LabAircraftInfo.setText("当前飞机状态：右转")
+         self.ledFunction.takeOffLed("turnRightLed")
 
       elif clickled == "keepDirectLed":
-         self.__LabAircraftInfo.setText("当前飞机状态：定向飞行")
-         self.ui.takeOffLed.state = 'off'
-         self.ui.takeOffLed.repaint()
-         self.ui.landingLed.state = 'off'
-         self.ui.landingLed.repaint()
-         self.ui.keepHeightLed.state = 'off'
-         self.ui.keepHeightLed.repaint()
-         self.ui.climb1Led.state = 'off'
-         self.ui.climb1Led.repaint()
-         self.ui.climb2Led.state = 'off'
-         self.ui.climb2Led.repaint()
-         self.ui.decline1Led.state = 'off'
-         self.ui.decline1Led.repaint()
-         self.ui.decline2Led.state = 'off'
-         self.ui.decline2Led.repaint()
-         self.ui.turnLeftLed.state = 'off'
-         self.ui.turnLeftLed.repaint()
-         self.ui.turnRightLed.state = 'off'
-         self.ui.turnRightLed.repaint()
-         self.ui.keepDirectLed.state = 'on'
-         self.ui.keepDirectLed.repaint()
-         self.ui.stopLed.state = 'off'
-         self.ui.stopLed.repaint()
+         self.LabAircraftInfo.setText("当前飞机状态：定向飞行")
+         self.ledFunction.takeOffLed("keepDirectLed")
       
       elif clickled == 'stopLed':
-         self.__LabAircraftInfo.setText("当前飞机状态：停止")
-         self.ui.takeOffLed.state = 'off'
-         self.ui.takeOffLed.repaint()
-         self.ui.landingLed.state = 'off'
-         self.ui.landingLed.repaint()
-         self.ui.keepHeightLed.state = 'off'
-         self.ui.keepHeightLed.repaint()
-         self.ui.climb1Led.state = 'off'
-         self.ui.climb1Led.repaint()
-         self.ui.climb2Led.state = 'off'
-         self.ui.climb2Led.repaint()
-         self.ui.decline1Led.state = 'off'
-         self.ui.decline1Led.repaint()
-         self.ui.decline2Led.state = 'off'
-         self.ui.decline2Led.repaint()
-         self.ui.turnLeftLed.state = 'off'
-         self.ui.turnLeftLed.repaint()
-         self.ui.turnRightLed.state = 'off'
-         self.ui.turnRightLed.repaint()
-         self.ui.keepDirectLed.state = 'off'
-         self.ui.keepDirectLed.repaint()
-         self.ui.stopLed.state = 'on'
-         self.ui.stopLed.repaint()
+         self.LabAircraftInfo.setText("当前飞机状态：停止")
+         self.ledFunction.takeOffLed("stopLed")
 
       elif clickled == "allLedOff":
-         self.__LabAircraftInfo.setText("当前飞机状态：等待")
-         self.ui.takeOffLed.state = 'off'
-         self.ui.takeOffLed.repaint()
-         self.ui.landingLed.state = 'off'
-         self.ui.landingLed.repaint()
-         self.ui.keepHeightLed.state = 'off'
-         self.ui.keepHeightLed.repaint()
-         self.ui.climb1Led.state = 'off'
-         self.ui.climb1Led.repaint()
-         self.ui.climb2Led.state = 'off'
-         self.ui.climb2Led.repaint()
-         self.ui.decline1Led.state = 'off'
-         self.ui.decline1Led.repaint()
-         self.ui.decline2Led.state = 'off'
-         self.ui.decline2Led.repaint()
-         self.ui.turnLeftLed.state = 'off'
-         self.ui.turnLeftLed.repaint()
-         self.ui.turnRightLed.state = 'off'
-         self.ui.turnRightLed.repaint()
-         self.ui.keepDirectLed.state = 'off'
-         self.ui.keepDirectLed.repaint()
-         self.ui.stopLed.state = 'off'
-         self.ui.keepDirectLed.repaint() 
+         self.LabAircraftInfo.setText("当前飞机状态：等待")
+         self.ledFunction.takeOffLed("allLedOff")
 
    # 读取内存数据  更新绘图   更新状态灯   该函数为定时执行函数
    def readData_UpFigure_UpState(self):
@@ -728,7 +471,7 @@ class QmyMainWindow(QMainWindow):
             self.LedProgrameControlState = newProgrameControlState
             if newProgrameControlState == 1:
                print("程控灯打开")
-
+               #self.ledStateMutex('allLedOff')
                self.ui.programeControlLed.state = 'on'
                self.ui.programeControlLed.repaint()
             else:
