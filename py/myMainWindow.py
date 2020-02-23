@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import sys, os
-import sys
-sys.path.append(r"e:/project/flight-control-simulation/py")
 
+import sys
+sys.path.append(r"./py")
 import time
 from PyQt5.QtWidgets import  (QApplication, QMainWindow,QLabel,QMessageBox)
 from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QTimer,QMargins
