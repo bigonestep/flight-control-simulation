@@ -1,0 +1,2 @@
+echo
+pyinstaller -F -w -i ./Icon6.ico ./myWidget.py ./myMainWindow.py ./ui_MainWelcome.py ./ui_MainRhapsody.py ./shareMem.py ./res_rc.py ./QMyLed.py  ./myFigureCanvas.py ./GetDataFromShareMem.py ./dataStack.py 
