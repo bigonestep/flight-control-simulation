@@ -78,7 +78,8 @@ class buttonFunc(object):
         self.ui_obj.LabRightInfo.setText("定向飞行按钮按下")
         retu = self.ui_obj.sendOrder('keepDirectLed')
         if retu == 0:
-            print("指令发送成功！！！")   
+            print("指令发送成功！！！") 
+              
 
 
 

@@ -6,6 +6,7 @@
 #import numpy as np
 import sys
 
+
 from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QTimer,QMargins
 from PyQt5.QtWidgets import  QWidget
 import matplotlib as mpl
