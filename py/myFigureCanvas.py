@@ -4,9 +4,6 @@
 ## 便于可视化设计
 
 #import numpy as np
-
-#from PyQt5.QtWidgets import  (QApplication, QMainWindow,
-#               QSplitter, QColorDialog, QLabel, QComboBox)
 from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QTimer,QMargins
 from PyQt5.QtWidgets import  QWidget
 import matplotlib as mpl
@@ -21,9 +18,7 @@ from mpl_toolkits.mplot3d import Axes3D      #一定不能注释
 from PyQt5.QtWidgets import   QVBoxLayout
 
 import matplotlib.image as img
-#from GetDataFromShareMem import getShareMemData
 
-#from dataStack import queue
 
 
 class QmyFigureCanvas(QWidget):

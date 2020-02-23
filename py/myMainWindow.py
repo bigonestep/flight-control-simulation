@@ -1,21 +1,11 @@
 # -*- coding: utf-8 -*-
-
 import sys, os
-
-#from PyQt5.QtWidgets import  (QApplication, QMainWindow,
-#               QSplitter, QColorDialog, QLabel,QMessageBox,
-#               QComboBox,QFontDialog,QColorDialog)
 from PyQt5.QtWidgets import  (QApplication, QMainWindow,QLabel,QMessageBox)
 from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QTimer,QMargins
-
-#from PyQt5.QtGui import QPainter,QPen,QColor,QBrush,QFont
-#from PyQt5.QtChart import QChart,QLineSeries,QValueAxis
 import numpy as np
 #import matplotlib as mpl
 #import matplotlib.style as mplStyle  #一个模块
 import matplotlib.image as img
-#from matplotlib.backends.backend_qt5agg import (FigureCanvas,
-#                 NavigationToolbar2QT as NavigationToolbar)
 
 #from QMyLed import QMyLed
 from ui_MainRhapsody import Ui_MainRhapsody
