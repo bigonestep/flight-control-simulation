@@ -1,21 +1,15 @@
 # -*- coding: utf-8 -*-
-
 import sys, os
+import sys
+sys.path.append(r"e:/project/flight-control-simulation/py")
 
-#from PyQt5.QtWidgets import  (QApplication, QMainWindow,
-#               QSplitter, QColorDialog, QLabel,QMessageBox,
-#               QComboBox,QFontDialog,QColorDialog)
+import time
 from PyQt5.QtWidgets import  (QApplication, QMainWindow,QLabel,QMessageBox)
 from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QTimer,QMargins
-
-#from PyQt5.QtGui import QPainter,QPen,QColor,QBrush,QFont
-#from PyQt5.QtChart import QChart,QLineSeries,QValueAxis
 import numpy as np
 #import matplotlib as mpl
 #import matplotlib.style as mplStyle  #一个模块
 import matplotlib.image as img
-#from matplotlib.backends.backend_qt5agg import (FigureCanvas,
-#                 NavigationToolbar2QT as NavigationToolbar)
 
 #from QMyLed import QMyLed
 from ui_MainRhapsody import Ui_MainRhapsody
@@ -23,7 +17,8 @@ from GetDataFromShareMem import getShareMemData   # .so为底层
 #from shareMem import getShareMemData              # py直接调用win的API作为底层
 #from myFigureCanvas import QmyFigureCanvas
 from dataStack import queue
-import time
+from buttonFunc import buttonFunc
+
 
 
 orderDict = {
@@ -54,6 +49,8 @@ class QmyMainWindow(QMainWindow):
       self.stopState = False
       ## ==================添加状态栏========================
       self.__buildUI()
+      ## ==================按钮功能类初始化==================
+      self.buttonFunction = buttonFunc(self)
       ## ==================打开共享内存模块=================
       self.ret = -1   # 打开共享内存标志位，若为0，则打开成功，若为-1 -2 则失败，一般读取内存中数据之前都要判断一下
 
@@ -61,15 +58,15 @@ class QmyMainWindow(QMainWindow):
       self.ret = self.openMemory()       #打开共享内存，由于.so使用的为创建内存，则这里一定会成功，即不用失败调用定时器一直创建了。
       if self.ret == -1:
          print("打开内存失败！！！")
-         self.__LabRightInfo.setText("打开内存失败！！！")
+         self.LabRightInfo.setText("打开内存失败！！！")
          #self.openMemTimer.start()
       elif self.ret == -2:
          print("指针指向失败！！！")
-         self.__LabRightInfo.setText("指针指向失败！！！")
+         self.LabRightInfo.setText("指针指向失败！！！")
          #self.openMemTimer.start()
       else:  
          print("打开共享内存成功！！！")
-         self.__LabRightInfo.setText("打开共享内存成功！！！")
+         self.LabRightInfo.setText("打开共享内存成功！！！")
       #self.openMemTimer.start()
       #self.openMemTimer.timeout.connect(self.__ret)
 ## ==================图============================
@@ -143,9 +140,9 @@ class QmyMainWindow(QMainWindow):
       self.ui.statusbar.addWidget(self.__LabInfo)
 
       # 最右侧1050
-      self.__LabRightInfo = QLabel(self)
-      self.__LabRightInfo.setText("")
-      self.ui.statusbar.addPermanentWidget(self.__LabRightInfo)
+      self.LabRightInfo = QLabel(self)
+      self.LabRightInfo.setText("")
+      self.ui.statusbar.addPermanentWidget(self.LabRightInfo)
 
    #====================高度图等四个图============================
    def drawFigure(self):
@@ -257,7 +254,7 @@ class QmyMainWindow(QMainWindow):
       if (result == QMessageBox.Yes):
          self.get.closeShareMem()
          print("关闭共享内存成功")
-         self.__LabRightInfo.setText("关闭共享内存成功")
+         self.LabRightInfo.setText("关闭共享内存成功")
          event.accept()
       else:
          event.ignore()
@@ -275,79 +272,45 @@ class QmyMainWindow(QMainWindow):
 ##  ==========由connectSlotsByName()自动连接的槽函数============ 
 
    def on_takeOffButton_clicked(self):
-      print("takeOffButton is clicked")
-      self.__LabRightInfo.setText("起飞按钮按下")
-      retu = self.sendOrder('takeOffLed')
-      if retu == 0:
-         print("指令发送成功！！！")
+      # print("takeOffButton is clicked")
+      # self.LabRightInfo.setText("起飞按钮按下")
+      # retu = self.sendOrder('takeOffLed')
+      # if retu == 0:
+      #    print("指令发送成功！！！")
+      self.buttonFunction.takeOffButton()
+
          
    def on_landingButton_clicked(self):
-      print("landingButton is clicked")
-      self.__LabRightInfo.setText("着陆按钮按下")
-      retu = self.sendOrder('landingLed')
-      if retu == 0:
-         print("指令发送成功！！！")
+      self.buttonFunction.landingButton()
 
    def on_keepHeightButton_clicked(self):
-      print("keepHeightButton is clicked")
-      self.__LabRightInfo.setText("定高飞行按钮按下")
-      retu = self.sendOrder('keepHeightLed')
-      if retu == 0:
-         print("指令发送成功！！！")
+      self.buttonFunction.keepHeightButton()
 
    def on_climb1Button_clicked(self):
-      print("climb1Button is clicked")
-      self.__LabRightInfo.setText("爬升1按钮按下")
-      retu = self.sendOrder('climb1Led')
-      if retu == 0:
-         print("指令发送成功！！！")
+      self.buttonFunction.climb1Button()
       
    def on_climb2Button_clicked(self):
-      print("climb2Button is clicked")
-      self.__LabRightInfo.setText("爬升2按钮按下")
-      retu = self.sendOrder('climb2Led')
-      if retu == 0:
-         print("指令发送成功！！！")
+      self.buttonFunction.climb2Button()
 
    def on_decline1Button_clicked(self):
-      print("decline1Button is clicked")
-      self.__LabRightInfo.setText("下滑1按钮按下")
-      retu = self.sendOrder('decline1Led')
-      if retu == 0:
-            print("指令发送成功！！！") 
+      self.buttonFunction.decline1Button()
 
    def on_decline2Button_clicked(self):
-      print("decline2Button is clicked")
-      self.__LabRightInfo.setText("下滑2按钮按下")
-      retu = self.sendOrder('decline2Led')
-      if retu == 0:
-         print("指令发送成功！！！")
+      self.buttonFunction.decline2Button()
 
    def on_turnLeftButton_clicked(self):
-      print("turnLeftButton is clicked")
-      self.__LabRightInfo.setText("左转按钮按下")
-      retu = self.sendOrder('turnLeftLed')
-      if retu == 0:
-         print("指令发送成功！！！")
+      self.buttonFunction.turnLeftButton()
 
    def on_turnRightButton_clicked(self):
-      print("turnRightButton is clicked")
-      self.__LabRightInfo.setText("右转按钮按下")
-      retu = self.sendOrder('turnRightLed')
-      if retu == 0:
-         print("指令发送成功！！！")
+      self.buttonFunction.turnRightButton()
 
    def on_keepDirectButton_clicked(self):
-      print("keepDirectButton is clicked")
-      self.__LabRightInfo.setText("定向飞行按钮按下")
-      retu = self.sendOrder('keepDirectLed')
-      if retu == 0:
-         print("指令发送成功！！！")   
+      self.buttonFunction.keepDirectButton()
 
 
    def on_programmedControlButton_clicked(self):
       print("self.programeControlLed_clicked:")
-      self.__LabRightInfo.setText("程控飞行按钮按下")
+      self.LabRightInfo.setText("程控飞行按钮按下")
       self.setprogrameControlOrder()
 
    # 保存图片按钮
@@ -815,7 +778,7 @@ class QmyMainWindow(QMainWindow):
          self.get.readOrWriteData('send','w',orderDict[order])
          self.judgeAircraftState(orderDict[order])
          print("写入指令：%d :"% int(self.get.readOrWriteData('send','r'))+ order)
-         #self.__LabRightInfo.setText("写入指令：%d :"% int(self.get.readOrWriteData('send','r'))+ order)
+         #self.LabRightInfo.setText("写入指令：%d :"% int(self.get.readOrWriteData('send','r'))+ order)
 
          retu = 0
       else:
@@ -829,7 +792,7 @@ class QmyMainWindow(QMainWindow):
             if retu == 0:
                self.judgeAircraftState(11)
                print("程控指令发送成功！！！")
-               self.__LabRightInfo.setText("程控指令发送成功！！！")
+               self.LabRightInfo.setText("程控指令发送成功！！！")
          else:
             retu = -1
       else:
@@ -842,9 +805,9 @@ class QmyMainWindow(QMainWindow):
       self.ret = self.get.openShareMem()
       if self.ret == -1:
          print("打开内存失败！！！")
-         self.__LabRightInfo.setText("打开内存失败！！！")
+         self.LabRightInfo.setText("打开内存失败！！！")
       elif self.ret == -2:
-         self.__LabRightInfo.setText("指针指向失败！！！")
+         self.LabRightInfo.setText("指针指向失败！！！")
          print("指针指向失败！！！")
       else:
          self.ret = 0

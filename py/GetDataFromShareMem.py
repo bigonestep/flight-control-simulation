@@ -27,7 +27,7 @@ class getShareMemData(object):
         self.ret_int = 0
 
     def openShareMem(self):
-        self.pylib = CDLL('./getShareData.so')
+        self.pylib = CDLL('getShareData.so')
         self.ret_int = self.pylib.getMem()
         if self.ret_int == -1:
             print("共享内存打开失败")

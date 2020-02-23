@@ -4,9 +4,8 @@
 ## 便于可视化设计
 
 #import numpy as np
-
-#from PyQt5.QtWidgets import  (QApplication, QMainWindow,
-#               QSplitter, QColorDialog, QLabel, QComboBox)
+import sys
+# sys.path.append(r"./")
 from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QTimer,QMargins
 from PyQt5.QtWidgets import  QWidget
 import matplotlib as mpl
@@ -21,9 +20,7 @@ from mpl_toolkits.mplot3d import Axes3D      #一定不能注释
 from PyQt5.QtWidgets import   QVBoxLayout
 
 import matplotlib.image as img
-#from GetDataFromShareMem import getShareMemData
 
-#from dataStack import queue
 
 
 class QmyFigureCanvas(QWidget):
@@ -45,7 +42,7 @@ class QmyFigureCanvas(QWidget):
       self.axMap =None   #地图的画图对象
       self.ax3D = None   #三维画图的对象
 
-      self.bgimg = img.imread('./map/1.png')   # 地图的画图的背景
+      self.bgimg = img.imread(r'E:/project/flight-control-simulation/py/map/1.png')   # 地图的画图的背景
 
       self.t = None   #二维图的x轴序列
 

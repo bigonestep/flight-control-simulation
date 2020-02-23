@@ -419,7 +419,7 @@
           </font>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot; style='line-height:70%'&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;南京航空航天大学&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot; style='line-height:70%'&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;上海电机学院&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot; style='line-height:80%'&gt;&lt;span style=&quot; color:#ffffff; &quot;&gt;先进飞行控制研究课题组&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot; style='line-height:70%'&gt;&lt;span style=&quot; color:#ffffff;&quot;&gt;南京航空航天大学&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot; style='line-height:80%'&gt;&lt;span style=&quot; color:#ffffff; &quot;&gt;先进飞行控制研究课题组&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
