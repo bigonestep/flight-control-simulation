@@ -1,4 +1,5 @@
-
+import os
+import time
 class buttonFunc(object):
     def __init__(self, ui_obj):
         self.ui_obj = ui_obj
@@ -79,7 +80,23 @@ class buttonFunc(object):
         retu = self.ui_obj.sendOrder('keepDirectLed')
         if retu == 0:
             print("指令发送成功！！！") 
-              
+
+    def programmedControlButton(self):
+        print("self.programeControlLed_clicked:")
+        self.ui_obj.LabRightInfo.setText("程控飞行按钮按下")
+        self.ui_obj.setprogrameControlOrder()
+
+    def saveFigButton(self):
+        new = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
+        filePath = "./curaeFile/"+new+"/"
+        if not os.path.isdir(filePath):
+            os.makedirs(filePath)
+        self.ui_obj.ui.heightView.fig.savefig("./curaeFile/"+new+"/"+"Height.png")
+        self.ui_obj.ui.thetaView.fig.savefig("./curaeFile/" + new + "/" + "theta.png")
+        self.ui_obj.ui.phiView.fig.savefig("./curaeFile/" + new + "/" + "phi.png")
+        self.ui_obj.ui.psiView.fig.savefig("./curaeFile/" + new + "/" + "psi.png")
+        self.ui_obj.ui.threeDView.figure.savefig("./curaeFile/" + new + "/" + "threeDimensional.png")
+
 
 
 
