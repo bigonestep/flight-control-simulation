@@ -310,22 +310,13 @@ class QmyMainWindow(QMainWindow):
 
 
    def on_programmedControlButton_clicked(self):
-      print("self.programeControlLed_clicked:")
-      self.LabRightInfo.setText("程控飞行按钮按下")
-      self.setprogrameControlOrder()
+      self.buttonFunction.programmedControlButton()
 
    # 保存图片按钮
    @pyqtSlot()
    def on_saveFigButton_clicked(self):
-      new = time.strftime("%Y_%m_%d_%H_%M_%S", time.localtime())
-      filePath = "./curaeFile/"+new+"/"
-      if not os.path.isdir(filePath):
-         os.makedirs(filePath)
-      self.ui.heightView.fig.savefig("./curaeFile/"+new+"/"+"Height.png")
-      self.ui.thetaView.fig.savefig("./curaeFile/" + new + "/" + "theta.png")
-      self.ui.phiView.fig.savefig("./curaeFile/" + new + "/" + "phi.png")
-      self.ui.psiView.fig.savefig("./curaeFile/" + new + "/" + "psi.png")
-      self.ui.threeDView.figure.savefig("./curaeFile/" + new + "/" + "threeDimensional.png")
+      self.buttonFunction.saveFigButton()
+
 
 
 ##  =============自定义槽函数===============================        
