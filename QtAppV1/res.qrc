@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>Img/matlab.ico</file>
+        <file>Img/pycharm.ico</file>
+        <file>Img/favicon.ico</file>
+        <file>Img/BookmarkIcon.ico</file>
+        <file>Img/Icon 6.ico</file>
+        <file>Img/Network Utility.ico</file>
+        <file>Img/Icon 6.png</file>
+        <file>Img/mat.png</file>
+        <file>Img/rh.png</file>
+        <file>Img/view.png</file>
+        <file>Img/loc1.png</file>
+        <file>Img/loc.png</file>
+    </qresource>
+</RCC>
