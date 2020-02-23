@@ -149,12 +149,6 @@ class QmyMainWindow(QMainWindow):
       self.time2 = self.time1
       self.time1 = time.time()
       print("%.4f" % (self.time1-self.time2))
-      '''
-      self.ui.heightView.drawFig("高度","t(s)",self.H.queueList,self.H_min,self.H_max, self.T,self.T+10)
-      self.ui.thetaView.drawFig("俯仰角","t(s)",self.theta.queueList,theta_min,theta_max, self.T,self.T+10)
-      self.ui.phiView.drawFig("滚转角","t(s)",self.phi.queueList,phi_min,phi_max, self.T,self.T+10)
-      self.ui.psiView.drawFig("偏航角","t(s)",self.psi.queueList,psi_min,psi_max, self.T,self.T+10)
-      '''
       self.ui.heightView.updateFig(self.H.queueList,self.H_min,self.H_max, self.T,self.T+10)
       self.ui.thetaView.updateFig(self.theta.queueList,theta_min,theta_max, self.T,self.T+10)
       self.ui.phiView.updateFig(self.phi.queueList,phi_min,phi_max, self.T,self.T+10)
@@ -318,54 +312,54 @@ class QmyMainWindow(QMainWindow):
 ## ==============自定义函数===============================
    # 设置指示灯的互斥，某一瞬间只有一个亮的
    def ledStateMutex(self,clickled):
-      
-      if clickled == "takeOffLed":
-         self.LabAircraftInfo.setText("当前飞机状态：起飞")
-         self.ledFunction.takeOffLed("takeOffLed")
+      self.ledFunction.ledState(clickled)
+      # if clickled == "takeOffLed":
+      #    self.LabAircraftInfo.setText("当前飞机状态：起飞")
+      #    self.ledFunction.takeOffLed("takeOffLed")
 
-      elif clickled == "landingLed":
-         self.LabAircraftInfo.setText("当前飞机状态：着陆")
-         self.ledFunction.takeOffLed("landingLed")
+      # elif clickled == "landingLed":
+      #    self.LabAircraftInfo.setText("当前飞机状态：着陆")
+      #    self.ledFunction.takeOffLed("landingLed")
 
-      elif clickled == "keepHeightLed":
-         self.LabAircraftInfo.setText("当前飞机状态：定高飞行")
-         self.ledFunction.takeOffLed("keepHeightLed")
+      # elif clickled == "keepHeightLed":
+      #    self.LabAircraftInfo.setText("当前飞机状态：定高飞行")
+      #    self.ledFunction.takeOffLed("keepHeightLed")
  
-      elif clickled == "climb1Led":
-         self.LabAircraftInfo.setText("当前飞机状态：爬升1")
-         self.ledFunction.takeOffLed("climb1Led")
+      # elif clickled == "climb1Led":
+      #    self.LabAircraftInfo.setText("当前飞机状态：爬升1")
+      #    self.ledFunction.takeOffLed("climb1Led")
 
-      elif clickled == "climb2Led":
-         self.LabAircraftInfo.setText("当前飞机状态：爬升2")
-         self.ledFunction.takeOffLed("climb2Led")
+      # elif clickled == "climb2Led":
+      #    self.LabAircraftInfo.setText("当前飞机状态：爬升2")
+      #    self.ledFunction.takeOffLed("climb2Led")
 
-      elif clickled == "decline1Led":
-         self.LabAircraftInfo.setText("当前飞机状态：下滑1")
-         self.ledFunction.takeOffLed("decline1Led")
+      # elif clickled == "decline1Led":
+      #    self.LabAircraftInfo.setText("当前飞机状态：下滑1")
+      #    self.ledFunction.takeOffLed("decline1Led")
 
-      elif clickled == "decline2Led":
-         self.LabAircraftInfo.setText("当前飞机状态：下滑2")
-         self.ledFunction.takeOffLed("decline2Led")
+      # elif clickled == "decline2Led":
+      #    self.LabAircraftInfo.setText("当前飞机状态：下滑2")
+      #    self.ledFunction.takeOffLed("decline2Led")
 
-      elif clickled == "turnLeftLed":
-         self.LabAircraftInfo.setText("当前飞机状态：左转")
-         self.ledFunction.takeOffLed("turnLeftLed")
+      # elif clickled == "turnLeftLed":
+      #    self.LabAircraftInfo.setText("当前飞机状态：左转")
+      #    self.ledFunction.takeOffLed("turnLeftLed")
 
-      elif clickled == "turnRightLed":
-         self.LabAircraftInfo.setText("当前飞机状态：右转")
-         self.ledFunction.takeOffLed("turnRightLed")
+      # elif clickled == "turnRightLed":
+      #    self.LabAircraftInfo.setText("当前飞机状态：右转")
+      #    self.ledFunction.takeOffLed("turnRightLed")
 
-      elif clickled == "keepDirectLed":
-         self.LabAircraftInfo.setText("当前飞机状态：定向飞行")
-         self.ledFunction.takeOffLed("keepDirectLed")
+      # elif clickled == "keepDirectLed":
+      #    self.LabAircraftInfo.setText("当前飞机状态：定向飞行")
+      #    self.ledFunction.takeOffLed("keepDirectLed")
       
-      elif clickled == 'stopLed':
-         self.LabAircraftInfo.setText("当前飞机状态：停止")
-         self.ledFunction.takeOffLed("stopLed")
+      # elif clickled == 'stopLed':
+      #    self.LabAircraftInfo.setText("当前飞机状态：停止")
+      #    self.ledFunction.takeOffLed("stopLed")
 
-      elif clickled == "allLedOff":
-         self.LabAircraftInfo.setText("当前飞机状态：等待")
-         self.ledFunction.takeOffLed("allLedOff")
+      # elif clickled == "allLedOff":
+      #    self.LabAircraftInfo.setText("当前飞机状态：等待")
+      #    self.ledFunction.takeOffLed("allLedOff")
 
    # 读取内存数据  更新绘图   更新状态灯   该函数为定时执行函数
    def readData_UpFigure_UpState(self):
