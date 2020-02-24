@@ -18,7 +18,7 @@ from GetDataFromShareMem import getShareMemData   # .so为底层
 #from myFigureCanvas import QmyFigureCanvas
 from dataStack import queue
 from buttonFunc import buttonFunc
-from  ledFunc import ledFunc
+from  ledFunc import ledFlightFunc
 
 ## 指示灯
 orderDict = {
@@ -32,6 +32,14 @@ orderDict = {
 edit = ('XEdit', 'YEdit', 'HEdit', 'alphaEdit', 'betaEdit', 
         'VtEdit', 'phiEdit', 'thetaEdit', 'psiEdit', 
         'pEdit', 'qEdit', 'rEdit')
+# 接收数据
+data = {
+    'X':0, 'Y':1, 'H':2, 'alpha':3, 'beta':4, 'Vt':5,
+    'phi':6, 'theta':7, 'psi':8, 'p':9, 'q':10, 'r':11,
+    # 'acceptState':13, 'programeControlState':14, 'send': 15
+    'acceptMode':13, 'acceptEngineStatus':14, 'acceptFlightStatus': 15,
+    'send':16
+}
         
 class QmyMainWindow(QMainWindow): 
    mapChanged = pyqtSignal(str)   # 发送一个地图名称
@@ -47,8 +55,8 @@ class QmyMainWindow(QMainWindow):
       self.__buildUI()
       ## ==================按钮功能类初始化==================
       self.buttonFunction = buttonFunc(self)
-      ## ================互斥灯============================
-      self.ledFunction = ledFunc(self)
+      ## ================飞行状态互斥灯============================
+      self.ledFlightFunction = ledFlightFunc(self)
       ## ==================打开共享内存模块=================
       self.ret = -1   # 打开共享内存标志位，若为0，则打开成功，若为-1 -2 则失败，一般读取内存中数据之前都要判断一下
 
@@ -114,7 +122,7 @@ class QmyMainWindow(QMainWindow):
 
 
       ## ================指示灯模块初始化=====================
-      self.LedState = 0
+      self.LedFlightState = 0
       self.LedProgrameControlState = 0        ## 程控灯的状态为灭的
       self.programeControlLed_clicked = False
       self.readData_UpFigure_UpState()
@@ -251,15 +259,6 @@ class QmyMainWindow(QMainWindow):
       else:
          event.ignore()
 
-   # 窗口大小改变事件重写
-   '''
-   def resizeEvent(self,event):
-
-      self.ui.mapView.bgimg = img.imread('./timg.jpg')
-
-      self.ui.mapView.figure.figimage(self.ui.mapView.bgimg)
-
-   '''
 
 ##  ==========由connectSlotsByName()自动连接的槽函数============ 
 
@@ -309,7 +308,7 @@ class QmyMainWindow(QMainWindow):
 ## ==============自定义函数===============================
    # 设置指示灯的互斥，某一瞬间只有一个亮的
    def ledStateMutex(self,clickled):
-      self.ledFunction.ledState(clickled)
+      self.ledFlightFunction.ledFlightState(clickled)
 
    #显示数据
    def dataShown(self):
@@ -323,10 +322,10 @@ class QmyMainWindow(QMainWindow):
       if self.ret == 0:
          self.para = self.get.readAll()
          # 小图获取数据
-         self.H.updata(self.para[2])
-         self.theta.updata(self.para[7])
-         self.phi.updata(self.para[6])
-         self.psi.updata(self.para[8])
+         self.H.updata(self.para[data['H']])
+         self.theta.updata(self.para[data['theta']])
+         self.phi.updata(self.para[data['phi']])
+         self.psi.updata(self.para[data['psi']])
          self.ui.heightView.t = np.linspace(self.T, self.T + 10,  len(self.H.queueList))
          self.ui.thetaView.t = np.linspace(self.T, self.T + 10, len(self.theta.queueList))
          self.ui.phiView.t = np.linspace(self.T, self.T + 10, len(self.phi.queueList))
@@ -336,27 +335,27 @@ class QmyMainWindow(QMainWindow):
          # 显示数据
          self.dataShown()
          #===========3维数据更新====================
-         self.X.updata(self.para[0])
-         self.Y.updata(self.para[1])
+         self.X.updata(self.para[data['X']])
+         self.Y.updata(self.para[data['Y']])
          self.drawThreeDFigure()
 
          # =============地图更新=====================
          self.drawMapFigure()
          
-         # ===============更新状态灯=============================
-         newState = int(self.get.readOrWriteData('acceptState','r'))
-         newProgrameControlState = int(self.get.readOrWriteData('programeControlState', 'r'))
+         # ===============更新飞行状态灯=============================
+         newFlightStatus = int(self.get.readOrWriteData('acceptFlightStatus','r'))
+         newProgrameControlState = int(self.get.readOrWriteData('acceptMode', 'r'))
 
-         if (self.LedState != newState):
-            self.LedState = newState
-            if newState == 12:
+         if (self.LedFlightState != newFlightStatus):
+            self.LedFlightState = newFlightStatus
+            if newFlightStatus == 12:
                   self.ledStateMutex('stopLed')
                   self.stopState = True
-            elif newState == 0:
+            elif newFlightStatus == 0:
                self.ledStateMutex('allLedOff')
             else:
                newdict = {v: k for k, v in orderDict.items()}  
-               self.ledStateMutex(newdict[newState])
+               self.ledStateMutex(newdict[newFlightStatus])
                if self.stopState == True:
                   self.stopState = False
                   self.reFig()
@@ -414,7 +413,7 @@ class QmyMainWindow(QMainWindow):
 
    def setprogrameControlOrder(self):
       if self.ret == 0:
-         if int(self.get.readOrWriteData('programeControlState','r')) != 1:
+         if int(self.get.readOrWriteData('acceptMode','r')) != 1:
             retu = self.get.readOrWriteData('send','w',11)
             if retu == 0:
                self.judgeAircraftState(11)

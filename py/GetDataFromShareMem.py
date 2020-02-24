@@ -6,8 +6,10 @@ from ctypes import *
 
 data = {
     'X':0, 'Y':1, 'H':2, 'alpha':3, 'beta':4, 'Vt':5,
-    'phi':6, 'theta':7, 'psi':8, 'p':9, 'q':10, 'r':11, 
-    'acceptState':13, 'programeControlState':14, 'send': 15
+    'phi':6, 'theta':7, 'psi':8, 'p':9, 'q':10, 'r':11,
+    # 'acceptState':13, 'programeControlState':14, 'send': 15
+    'acceptMode':13, 'acceptEngineStatus':14, 'acceptFlightStatus': 15,
+    'send':16
 }
 
 class getShareMemData(object):

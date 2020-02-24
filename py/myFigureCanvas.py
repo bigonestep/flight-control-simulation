@@ -59,7 +59,7 @@ class QmyFigureCanvas(QWidget):
       然后把该对象加入到 Qt留出来的空白画图区
       设置画图为 1 幅
       '''
-      self.fig=figure.Figure(dpi=80)
+      self.fig=figure.Figure(dpi=50)
       figCanvas = FigureCanvas(self.fig)  #创建FigureCanvas对象，必须传递一个Figure对象
       #self.fig.subplots_adjust(bottom=0.17)
       
@@ -100,7 +100,7 @@ class QmyFigureCanvas(QWidget):
    # 创建三维曲线
    def createThreeDFigure(self):
 
-      self.figure = figure.Figure(dpi=80)
+      self.figure = figure.Figure(dpi=50)
       figCanvas = FigureCanvas(self.figure)
 
       layout = QVBoxLayout(self)
@@ -137,7 +137,7 @@ class QmyFigureCanvas(QWidget):
 
    # 创建地图二维图的画布
    def createMapFigure(self):
-      self.figure = figure.Figure(dpi=80)
+      self.figure = figure.Figure(dpi=50)
       self.figure.clear()
 
       self.figure.figimage(self.bgimg)
