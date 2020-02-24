@@ -1,25 +1,13 @@
-
+import sys
 from ctypes import *
 #import time
 #import threading
 #from pynput.keyboard import Key, Listener
 
 data = {
-    'X':0,
-    'Y':1,
-    'H':2,
-    'alpha':3,
-    'beta':4,
-    'Vt':5,
-    'phi':6,
-    'theta':7,
-    'psi':8,
-    'p':9,
-    'q':10,
-    'r':11,
-    'acceptState':13,
-    'programeControlState':14,
-    'send': 15
+    'X':0, 'Y':1, 'H':2, 'alpha':3, 'beta':4, 'Vt':5,
+    'phi':6, 'theta':7, 'psi':8, 'p':9, 'q':10, 'r':11, 
+    'acceptState':13, 'programeControlState':14, 'send': 15
 }
 
 class getShareMemData(object):
@@ -27,7 +15,7 @@ class getShareMemData(object):
         self.ret_int = 0
 
     def openShareMem(self):
-        self.pylib = CDLL('getShareData.so')
+        self.pylib = CDLL(r'./getShareData.so')
         self.ret_int = self.pylib.getMem()
         if self.ret_int == -1:
             print("共享内存打开失败")

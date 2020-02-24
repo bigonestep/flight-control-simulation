@@ -43,7 +43,7 @@ class QmyFigureCanvas(QWidget):
       self.axMap =None   #地图的画图对象
       self.ax3D = None   #三维画图的对象
 
-      self.bgimg = img.imread(r'E:/project/flight-control-simulation/py/map/1.png')   # 地图的画图的背景
+      self.bgimg = img.imread(r'./map/1.png')   # 地图的画图的背景
 
       self.t = None   #二维图的x轴序列
 

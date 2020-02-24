@@ -2,8 +2,7 @@
 import sys, os
 
 import sys
-sys.path.append(r"./py")
-
+sys.path.append("./py")
 import time
 from PyQt5.QtWidgets import  (QApplication, QMainWindow,QLabel,QMessageBox)
 from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QTimer,QMargins
@@ -21,7 +20,7 @@ from dataStack import queue
 from buttonFunc import buttonFunc
 from  ledFunc import ledFunc
 
-
+## 指示灯
 orderDict = {
    'allLedOff':0, 'takeOffLed':1, 'landingLed':2,
    'keepHeightLed':9, 'climb1Led':3, 'climb2Led':5,
@@ -29,7 +28,11 @@ orderDict = {
    'turnRightLed':8, 'keepDirectLed':10, 'programeControlLed':11,
    'stopLed':12
 }
-
+## 文本数据显示框
+edit = ('XEdit', 'YEdit', 'HEdit', 'alphaEdit', 'betaEdit', 
+        'VtEdit', 'phiEdit', 'thetaEdit', 'psiEdit', 
+        'pEdit', 'qEdit', 'rEdit')
+        
 class QmyMainWindow(QMainWindow): 
    mapChanged = pyqtSignal(str)   # 发送一个地图名称
    def __init__(self, parent=None):
@@ -261,14 +264,8 @@ class QmyMainWindow(QMainWindow):
 ##  ==========由connectSlotsByName()自动连接的槽函数============ 
 
    def on_takeOffButton_clicked(self):
-      # print("takeOffButton is clicked")
-      # self.LabRightInfo.setText("起飞按钮按下")
-      # retu = self.sendOrder('takeOffLed')
-      # if retu == 0:
-      #    print("指令发送成功！！！")
       self.buttonFunction.takeOffButton()
-
-         
+ 
    def on_landingButton_clicked(self):
       self.buttonFunction.landingButton()
 
@@ -314,6 +311,13 @@ class QmyMainWindow(QMainWindow):
    def ledStateMutex(self,clickled):
       self.ledFunction.ledState(clickled)
 
+   #显示数据
+   def dataShown(self):
+         for i, enum in enumerate(edit):
+            func = getattr(self.ui, enum).setText
+            func("%.2f"%self.para[i])
+
+
    # 读取内存数据  更新绘图   更新状态灯   该函数为定时执行函数
    def readData_UpFigure_UpState(self):
       if self.ret == 0:
@@ -330,19 +334,7 @@ class QmyMainWindow(QMainWindow):
          self.drawFigure()
          self.T += 0.1
          # 显示数据
-         self.ui.XEdit.setText("%.2f"%self.para[0])
-         self.ui.YEdit.setText("%.2f" % self.para[1])
-         self.ui.HEdit.setText("%.2f"%self.para[2])
-         self.ui.alphaEdit.setText("%.2f" % self.para[3])
-         self.ui.betaEdit.setText("%.2f" % self.para[4])
-         self.ui.VtEdit.setText("%.2f" % self.para[5])
-         self.ui.phiEdit.setText("%.2f" % self.para[6])
-         self.ui.thetaEdit.setText("%.2f" % self.para[7])
-         self.ui.psiEdit.setText("%.2f" % self.para[8])
-         self.ui.pEdit.setText("%.2f" % self.para[9])
-         self.ui.qEdit.setText("%.2f" % self.para[10])
-         self.ui.rEdit.setText("%.2f" % self.para[11])
-
+         self.dataShown()
          #===========3维数据更新====================
          self.X.updata(self.para[0])
          self.Y.updata(self.para[1])
@@ -357,63 +349,18 @@ class QmyMainWindow(QMainWindow):
 
          if (self.LedState != newState):
             self.LedState = newState
-         
-            if newState == 1:
-               self.ledStateMutex('takeOffLed')
-               if self.stopState == True:
-                  self.stopState = False
-                  self.reFig()
-            elif newState == 2:
-               self.ledStateMutex('landingLed')
-               if self.stopState == True:
-                  self.stopState = False
-                  self.reFig()
-            elif newState == 9:
-               self.ledStateMutex('keepHeightLed')
-               if self.stopState == True:
-                  self.stopState = False
-                  self.reFig()
-            elif newState == 3:
-               self.ledStateMutex('climb1Led')
-               if self.stopState == True:
-                  self.stopState = False
-                  self.reFig()
-            elif newState == 5:
-               self.ledStateMutex('climb2Led')
-               if self.stopState == True:
-                  self.stopState = False
-                  self.reFig()
-            elif newState == 4:
-               self.ledStateMutex('decline1Led')
-               if self.stopState == True:
-                  self.stopState = False
-                  self.reFig()
-            elif newState == 6:
-               self.ledStateMutex('decline2Led')
-               if self.stopState == True:
-                  self.stopState = False
-                  self.reFig()
-            elif newState == 7:
-               self.ledStateMutex('turnLeftLed')
-               if self.stopState == True:
-                  self.stopState = False
-                  self.reFig()
-            elif newState == 8:
-               self.ledStateMutex('turnRightLed')
-               if self.stopState == True:
-                  self.stopState = False
-                  self.reFig()
-            elif newState == 10:
-               self.ledStateMutex('keepDirectLed')
-               if self.stopState == True:
-                  self.stopState = False
-                  self.reFig()
-            elif newState == 12:
-               self.ledStateMutex('stopLed')
-               self.stopState = True
-            else:
+            if newState == 12:
+                  self.ledStateMutex('stopLed')
+                  self.stopState = True
+            elif newState == 0:
                self.ledStateMutex('allLedOff')
-
+            else:
+               newdict = {v: k for k, v in orderDict.items()}  
+               self.ledStateMutex(newdict[newState])
+               if self.stopState == True:
+                  self.stopState = False
+                  self.reFig()
+   
          if  self.LedProgrameControlState != newProgrameControlState:
             self.LedProgrameControlState = newProgrameControlState
             if newProgrameControlState == 1:
@@ -460,8 +407,6 @@ class QmyMainWindow(QMainWindow):
          self.get.readOrWriteData('send','w',orderDict[order])
          self.judgeAircraftState(orderDict[order])
          print("写入指令：%d :"% int(self.get.readOrWriteData('send','r'))+ order)
-         #self.LabRightInfo.setText("写入指令：%d :"% int(self.get.readOrWriteData('send','r'))+ order)
-
          retu = 0
       else:
          retu = -1
