@@ -24,8 +24,7 @@ HEADERS += \
 
 FORMS += \
     MainRhapsody.ui \
-    MainWelcome.ui \
-    welcomeForm.ui
+    MainWelcome.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

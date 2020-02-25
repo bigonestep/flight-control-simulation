@@ -1,3 +1,10 @@
+''' 
+* @Author: Wang.Zhihui  
+* @Date: 2020-02-26 01:35:47  
+* @Last Modified by:   Wang.Zhihui  
+* @Last Modified time: 2020-02-26 01:35:47  
+* @function:   绘制二维三维曲线
+'''
 
 ## 自定义类 QmyFigureCanvas，父类QWidget
 ## 创建了FigureCanvas和NavigationToolbar，组成一个整体
@@ -59,7 +66,7 @@ class QmyFigureCanvas(QWidget):
       然后把该对象加入到 Qt留出来的空白画图区
       设置画图为 1 幅
       '''
-      self.fig=figure.Figure(dpi=50)
+      self.fig=figure.Figure(dpi=80)
       figCanvas = FigureCanvas(self.fig)  #创建FigureCanvas对象，必须传递一个Figure对象
       #self.fig.subplots_adjust(bottom=0.17)
       
@@ -137,7 +144,7 @@ class QmyFigureCanvas(QWidget):
 
    # 创建地图二维图的画布
    def createMapFigure(self):
-      self.figure = figure.Figure(dpi=50)
+      self.figure = figure.Figure(dpi=80)
       self.figure.clear()
 
       self.figure.figimage(self.bgimg)

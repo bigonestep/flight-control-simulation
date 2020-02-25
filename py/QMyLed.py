@@ -1,6 +1,16 @@
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+# -*- coding: utf-8 -*-
+''' 
+* @Author: Wang.Zhihui  
+* @Date: 2020-02-25 14:56:04  
+* @Last Modified by:   Wang.Zhihui  
+* @Last Modified time: 2020-02-25 14:56:04  
+* @function: LED灯控件
+'''
+
+
+from PyQt5.QtGui import (QPainter, QPen, QRadialGradient, QColor, QBrush)
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtCore import Qt, QPointF
 
 
 

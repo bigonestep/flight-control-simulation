@@ -1,14 +1,20 @@
+# -*- coding: utf-8 -*-
+''' 
+* @Author: Wang.Zhihui  
+* @Date: 2020-02-26 01:35:22  
+* @Last Modified by:   Wang.Zhihui  
+* @Last Modified time: 2020-02-26 01:35:22  
+* @function: 获取数据
+'''
 import sys
-from ctypes import *
-#import time
-#import threading
-#from pynput.keyboard import Key, Listener
+from ctypes import CDLL, POINTER, c_double, c_int
+
 
 data = {
     'X':0, 'Y':1, 'H':2, 'alpha':3, 'beta':4, 'Vt':5,
     'phi':6, 'theta':7, 'psi':8, 'p':9, 'q':10, 'r':11,
     # 'acceptState':13, 'programeControlState':14, 'send': 15
-    'acceptMode':13, 'acceptEngineStatus':14, 'acceptFlightStatus': 15,
+    'acceptFlightStatus': 13, 'acceptModel':14, 'acceptEngineStatus':15, 
     'send':16
 }
 
@@ -45,6 +51,7 @@ class getShareMemData(object):
         'r': 返回读取的数据，或者错误代码
         'w': 返回错误代码
         '''
+        # print("n:", n, 'key:',key)
         if (n not in ('r','w')) or key not in data.keys() :
             print("参数错误：not is 'r' or 'w' 或者 获取数据未在字典里面")
             return -1
@@ -85,7 +92,7 @@ class getShareMemData(object):
 
 
 
-"""
+
 if __name__ == '__main__':
     i = 0
     dataList = []
@@ -105,7 +112,7 @@ if __name__ == '__main__':
             print("打开失败")
         get.closeShareMem()
 
-"""
+
         
     
         

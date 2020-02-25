@@ -2,13 +2,11 @@
 
 # Form implementation generated from reading ui file 'MainWelcome.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.0
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_MainWelcome(object):
     def setupUi(self, MainWelcome):
@@ -203,5 +201,6 @@ class Ui_MainWelcome(object):
         self.label_5.setText(_translate("MainWelcome", "<html><head/><body><p><span style=\" color:#ffffff;\">控制逻辑</span></p></body></html>"))
         self.label_3.setText(_translate("MainWelcome", "<html><head/><body><p><span style=\" color:#ffffff;\">地面站</span></p></body></html>"))
         self.label_4.setText(_translate("MainWelcome", "<html><head/><body><p><span style=\" color:#ffffff;\">控制律</span></p></body></html>"))
-        self.label_2.setText(_translate("MainWelcome", "<html><head/><body><p align=\"center\" style=\'line-height:70%\'><span style=\" color:#ffffff;\">南京航空航天大学</span></p><p align=\"center\" style=\'line-height:70%\'><span style=\" color:#ffffff;\">上海电机学院</span></p><p align=\"center\" style=\'line-height:80%\'><span style=\" color:#ffffff; \">先进飞行控制研究课题组</span></p></body></html>"))
+        self.label_2.setText(_translate("MainWelcome", "<html><head/><body><p align=\"center\" style=\'line-height:70%\'><span style=\" color:#ffffff;\">南京航空航天大学</span></p><p align=\"center\" style=\'line-height:80%\'><span style=\" color:#ffffff; \">先进飞行控制研究课题组</span></p></body></html>"))
+
 import res_rc

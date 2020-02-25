@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-
+''' 
+* @Author: Wang.Zhihui  
+* @Date: 2020-02-26 02:07:40  
+* @Last Modified by:   Wang.Zhihui  
+* @Last Modified time: 2020-02-26 02:07:40  
+* @function: 主界面
+'''
 import sys,os
 
 #import subprocess

@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
+''' 
+* @Author: Wang.Zhihui  
+* @Date: 2020-02-26 02:08:04  
+* @Last Modified by:   Wang.Zhihui  
+* @Last Modified time: 2020-02-26 02:08:04  
+* @function:  联合仿真界面
+'''
 import sys, os
-
-import sys
-sys.path.append("./py")
 import time
 from PyQt5.QtWidgets import  (QApplication, QMainWindow,QLabel,QMessageBox)
 from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QTimer,QMargins
 import numpy as np
-#import matplotlib as mpl
-#import matplotlib.style as mplStyle  #一个模块
 import matplotlib.image as img
-
-#from QMyLed import QMyLed
 from ui_MainRhapsody import Ui_MainRhapsody
 from GetDataFromShareMem import getShareMemData   # .so为底层
 #from shareMem import getShareMemData              # py直接调用win的API作为底层
@@ -19,28 +19,12 @@ from GetDataFromShareMem import getShareMemData   # .so为底层
 from dataStack import queue
 from buttonFunc import buttonFunc
 from  ledFunc import ledFlightFunc
+from conf import (ledFlight, ledEngine, ledModel,
+                  orderDict, orderInfo, edit,data,
+                  updateTime
+                  )
 
-## 指示灯
-orderDict = {
-   'allLedOff':0, 'takeOffLed':1, 'landingLed':2,
-   'keepHeightLed':9, 'climb1Led':3, 'climb2Led':5,
-   'decline1Led':4, 'decline2Led':6, 'turnLeftLed':7,
-   'turnRightLed':8, 'keepDirectLed':10, 'programeControlLed':11,
-   'stopLed':12
-}
-## 文本数据显示框
-edit = ('XEdit', 'YEdit', 'HEdit', 'alphaEdit', 'betaEdit', 
-        'VtEdit', 'phiEdit', 'thetaEdit', 'psiEdit', 
-        'pEdit', 'qEdit', 'rEdit')
-# 接收数据
-data = {
-    'X':0, 'Y':1, 'H':2, 'alpha':3, 'beta':4, 'Vt':5,
-    'phi':6, 'theta':7, 'psi':8, 'p':9, 'q':10, 'r':11,
-    # 'acceptState':13, 'programeControlState':14, 'send': 15
-    'acceptMode':13, 'acceptEngineStatus':14, 'acceptFlightStatus': 15,
-    'send':16
-}
-        
+     
 class QmyMainWindow(QMainWindow): 
    mapChanged = pyqtSignal(str)   # 发送一个地图名称
    def __init__(self, parent=None):
@@ -48,14 +32,15 @@ class QmyMainWindow(QMainWindow):
       self.ui=Ui_MainRhapsody()    # 创建UI对象
       self.ui.setupUi(self)      # 构造UI界面
       self.setCentralWidget(self.ui.splitter)
+      
 
       # 记录上一个状态是否为stop状态
       self.stopState = False
       ## ==================添加状态栏========================
       self.__buildUI()
       ## ==================按钮功能类初始化==================
-      self.buttonFunction = buttonFunc(self)
-      ## ================飞行状态互斥灯============================
+      # self.buttonFunction = buttonFunc(self)  # 改用静态方法
+      ## ================飞行状态互斥灯======================
       self.ledFlightFunction = ledFlightFunc(self)
       ## ==================打开共享内存模块=================
       self.ret = -1   # 打开共享内存标志位，若为0，则打开成功，若为-1 -2 则失败，一般读取内存中数据之前都要判断一下
@@ -101,10 +86,15 @@ class QmyMainWindow(QMainWindow):
       self.ui.psiView.drawFig("偏航角","t(s)",self.psi.queueList)
       
       # 设置小图边距
-      self.ui.heightView.fig.subplots_adjust(right=1, left=0.17)# 设置边距   范围为（0-1）其中右越大越靠边，左越小越靠边
-      self.ui.thetaView.fig.subplots_adjust(right=1, left=0.17)
-      self.ui.phiView.fig.subplots_adjust(right=1, left=0.17)
-      self.ui.psiView.fig.subplots_adjust(right=1, left=0.17)
+      self.ui.heightView.fig.subplots_adjust(right=1, left=0.12, 
+                                             top=1, bottom = 0.2)
+      # 设置边距   范围为（0-1）其中右上越大越靠边，左下越小越靠边
+      self.ui.thetaView.fig.subplots_adjust(right=1, left=0.12,
+                                           top=1, bottom = 0.2)
+      self.ui.phiView.fig.subplots_adjust(right=1, left=0.12, 
+                                          top=1, bottom = 0.2)
+      self.ui.psiView.fig.subplots_adjust(right=1, left=0.12, 
+                                          top=1, bottom = 0.2)
       # =========================绘制 3维曲线 ==========================
       self.X = queue(dotNum)
       self.Y = queue(dotNum)
@@ -128,11 +118,11 @@ class QmyMainWindow(QMainWindow):
       self.readData_UpFigure_UpState()
       self.LedTimer = QTimer()
       self.LedTimer.stop()
-      self.LedTimer.setInterval(70)   # 200ms
+      self.LedTimer.setInterval(updateTime)   # 100ms
       self.LedTimer.start()
       self.LedTimer.timeout.connect(self.readData_UpFigure_UpState)  # 刷新指示灯状态 刷新绘图
 
-
+      
    # ===================状态栏============================
    def __buildUI(self):
       self.LabAircraftInfo = QLabel(self)
@@ -159,7 +149,7 @@ class QmyMainWindow(QMainWindow):
       print(len(self.H.queueList))
       self.time2 = self.time1
       self.time1 = time.time()
-      print("%.4f" % (self.time1-self.time2))
+      print("%.4f" % (self.time1-self.time2))    
       self.ui.heightView.updateFig(self.H.queueList,self.H_min,self.H_max, self.T,self.T+10)
       self.ui.thetaView.updateFig(self.theta.queueList,theta_min,theta_max, self.T,self.T+10)
       self.ui.phiView.updateFig(self.phi.queueList,phi_min,phi_max, self.T,self.T+10)
@@ -263,43 +253,46 @@ class QmyMainWindow(QMainWindow):
 ##  ==========由connectSlotsByName()自动连接的槽函数============ 
 
    def on_takeOffButton_clicked(self):
-      self.buttonFunction.takeOffButton()
+      buttonFunc.takeOffButton(self)
  
+
    def on_landingButton_clicked(self):
-      self.buttonFunction.landingButton()
+      buttonFunc.landingButton(self)
+
 
    def on_keepHeightButton_clicked(self):
-      self.buttonFunction.keepHeightButton()
+      buttonFunc.keepHeightButton(self)
+
 
    def on_climb1Button_clicked(self):
-      self.buttonFunction.climb1Button()
+      buttonFunc.climb1Button(self)
       
    def on_climb2Button_clicked(self):
-      self.buttonFunction.climb2Button()
+      buttonFunc.climb2Button(self)
 
    def on_decline1Button_clicked(self):
-      self.buttonFunction.decline1Button()
+      buttonFunc.decline1Button(self)
 
    def on_decline2Button_clicked(self):
-      self.buttonFunction.decline2Button()
+      buttonFunc.decline2Button(self)
 
    def on_turnLeftButton_clicked(self):
-      self.buttonFunction.turnLeftButton()
+      buttonFunc.turnLeftButton(self)
 
    def on_turnRightButton_clicked(self):
-      self.buttonFunction.turnRightButton()
+      buttonFunc.turnRightButton(self)
 
    def on_keepDirectButton_clicked(self):
-      self.buttonFunction.keepDirectButton()
+      buttonFunc.keepDirectButton(self)
 
-
-   def on_programmedControlButton_clicked(self):
-      self.buttonFunction.programmedControlButton()
+      #   
+   def on_programeControlModelButton_clicked(self):
+      buttonFunc.programeControlModelButton(self)
 
    # 保存图片按钮
    @pyqtSlot()
    def on_saveFigButton_clicked(self):
-      self.buttonFunction.saveFigButton()
+      buttonFunc.saveFigButton(self)
 
 
 
@@ -307,7 +300,7 @@ class QmyMainWindow(QMainWindow):
 
 ## ==============自定义函数===============================
    # 设置指示灯的互斥，某一瞬间只有一个亮的
-   def ledStateMutex(self,clickled):
+   def ledFlightStateMutex(self,clickled):
       self.ledFlightFunction.ledFlightState(clickled)
 
    #显示数据
@@ -318,7 +311,7 @@ class QmyMainWindow(QMainWindow):
 
 
    # 读取内存数据  更新绘图   更新状态灯   该函数为定时执行函数
-   def readData_UpFigure_UpState(self):
+   def readData_UpFigure_UpState(self):     # TODO: 用多线程分解以一下
       if self.ret == 0:
          self.para = self.get.readAll()
          # 小图获取数据
@@ -344,81 +337,58 @@ class QmyMainWindow(QMainWindow):
          
          # ===============更新飞行状态灯=============================
          newFlightStatus = int(self.get.readOrWriteData('acceptFlightStatus','r'))
-         newProgrameControlState = int(self.get.readOrWriteData('acceptMode', 'r'))
-
+         newProgrameControlState = int(self.get.readOrWriteData('acceptModel', 'r'))
          if (self.LedFlightState != newFlightStatus):
             self.LedFlightState = newFlightStatus
-            if newFlightStatus == 12:
-                  self.ledStateMutex('stopLed')
+            if newFlightStatus == ledFlight['stopLed']:
+                  self.ledFlightStateMutex('stopLed')
                   self.stopState = True
-            elif newFlightStatus == 0:
-               self.ledStateMutex('allLedOff')
+            elif newFlightStatus == ledFlight['allLedOff']:
+               self.ledFlightStateMutex('allLedOff')
             else:
-               newdict = {v: k for k, v in orderDict.items()}  
-               self.ledStateMutex(newdict[newFlightStatus])
+               newdict = {v: k for k, v in ledFlight.items()}  
+               self.ledFlightStateMutex(newdict[newFlightStatus])
                if self.stopState == True:
                   self.stopState = False
                   self.reFig()
    
          if  self.LedProgrameControlState != newProgrameControlState:
-            self.LedProgrameControlState = newProgrameControlState
-            if newProgrameControlState == 1:
-               print("程控灯打开")
-               #self.ledStateMutex('allLedOff')
-               self.ui.programeControlLed.state = 'on'
-               self.ui.programeControlLed.repaint()
+            self.LedProgrameControlState = newProgrameControlState   
+            if newProgrameControlState == ledModel['programeControlModelLed']:
+               print("程控灯打开")       # TODO: 这地方要改成模式集体控制
+               self.ui.programeControlModelLed.state = 'on'
+               self.ui.programeControlModelLed.repaint()
             else:
                print("程控灯关闭")
-
-               self.ui.programeControlLed.state = 'off'
-               self.ui.programeControlLed.repaint()
+               self.ui.programeControlModelLed.state = 'off'
+               self.ui.programeControlModelLed.repaint()
          retu = 0
       else:
          retu = -1
       return retu
 
-   def judgeAircraftState(self, state):
-         if state == 1:
-            self.__LabInfo.setText("发送指令：起飞")
-         elif state == 2:
-            self.__LabInfo.setText("发送指令：着陆")
-         elif state == 3:
-            self.__LabInfo.setText("发送指令：爬升1")
-         elif state == 4:
-            self.__LabInfo.setText("发送指令：下滑1")
-         elif state == 5:
-            self.__LabInfo.setText("发送指令：爬升2")
-         elif state == 6:
-            self.__LabInfo.setText("发送指令：下滑2")
-         elif state == 7:
-            self.__LabInfo.setText("发送指令：左转")
-         elif state == 8:
-            self.__LabInfo.setText("发送指令：右转")
-         elif state == 9:
-            self.__LabInfo.setText("发送指令：定高飞行")
-         elif state == 10:
-            self.__LabInfo.setText("发送指令：定向飞行")
-         elif state == 11:
-            self.__LabInfo.setText("发送指令：程控飞行")
+   def judgeFlightState(self, state):
+      for i in range(1, len(orderInfo)):
+         if state == i:
+            self.__LabInfo.setText("发送指令:"+orderInfo[i])
 
+         
    def sendOrder(self, order):
       if self.ret == 0:
          self.get.readOrWriteData('send','w',orderDict[order])
-         self.judgeAircraftState(orderDict[order])
+         self.judgeFlightState(orderDict[order])
          print("写入指令：%d :"% int(self.get.readOrWriteData('send','r'))+ order)
          retu = 0
       else:
          retu = -1
       return retu
-
-   def setprogrameControlOrder(self):
+   
+   def setProgrameControlOrder(self):
       if self.ret == 0:
-         if int(self.get.readOrWriteData('acceptMode','r')) != 1:
-            retu = self.get.readOrWriteData('send','w',11)
-            if retu == 0:
-               self.judgeAircraftState(11)
-               print("程控指令发送成功！！！")
-               self.LabRightInfo.setText("程控指令发送成功！！！")
+         if int(self.get.readOrWriteData('acceptModel','r')) != 1:
+            retu = self.get.readOrWriteData('send','w',orderDict['programeControlModel'])    # TODO: 要敲定程控是哪个命令
+            if retu == 0:  
+               self.judgeFlightState(orderDict['programeControlModel'])  
          else:
             retu = -1
       else:
@@ -443,7 +413,7 @@ class QmyMainWindow(QMainWindow):
       if self.ret != 0:
          self.ret = self.openMemory()
 
-   # 使X、Y、H画图的数据截取到后三十个
+   # 使X、Y、H画图的数据截取到后二个
    def reFig(self):
       self.X.savaData()
       self.Y.savaData()
