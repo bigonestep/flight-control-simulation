@@ -92,9 +92,89 @@ class buttonFunc(object):
 
     @staticmethod  #
     def programeControlModelButton(ui_obj):
-        print("programeControl_clicked:")
+        print("programeControlButton is clicked")
         ui_obj.LabRightInfo.setText("程控飞行按钮按下")
-        ui_obj.setProgrameControlOrder()
+        retu = ui_obj.sendOrder("programeControlModel")
+        if retu == 0:
+            print("指令发送成功！！！")
+    
+    @staticmethod
+    def remoteControlModelButton(ui_obj):
+        print("remoteControlModelButton is clicked")
+        ui_obj.LabRightInfo.setText("遥控飞行按钮按下")
+        retu = ui_obj.sendOrder("remoteControlModel")
+        if retu == 0:
+            print("指令发送成功！！！")
+    
+    @staticmethod
+    def internalControlModelButton(ui_obj):
+        print("internalControlModelButton is clicked")
+        ui_obj.LabRightInfo.setText("内控飞行按钮按下")
+        retu = ui_obj.sendOrder("internalControlModel")
+        if retu == 0:
+            print("指令发送成功！！！")
+
+
+    # 发动机
+    @staticmethod
+    def bigCartButton(ui_obj):
+        print("bigCartButton is clicked")
+        ui_obj.LabRightInfo.setText("大车按钮按下")
+        retu = ui_obj.sendOrder("bigCart")
+        if retu == 0:
+            print("指令发送成功！！！")
+    @staticmethod
+    def ratedButton(ui_obj):
+        print("ratedButton is clicked")
+        ui_obj.LabRightInfo.setText("额定按钮按下")
+        retu = ui_obj.sendOrder("rated")
+        if retu == 0:
+            print("指令发送成功！！！")
+
+    @staticmethod
+    def cruiseButton(ui_obj):
+        print("cruiseButton is clicked")
+        ui_obj.LabRightInfo.setText("巡航按钮按下")
+        retu = ui_obj.sendOrder("cruise")
+        if retu == 0:
+            print("指令发送成功！！！")
+
+
+    @staticmethod
+    def slowTrainButton(ui_obj):
+        print("slowTrainButton is clicked")
+        ui_obj.LabRightInfo.setText("慢车按钮按下")
+        retu = ui_obj.sendOrder("slowTrain")
+        if retu == 0:
+            print("指令发送成功！！！")
+
+    @staticmethod
+    def idlingButton(ui_obj):
+        print("idlingButton is clicked")
+        ui_obj.LabRightInfo.setText("怠速按钮按下")
+        retu = ui_obj.sendOrder("idling")
+        if retu == 0:
+            print("指令发送成功！！！")
+
+
+    @staticmethod
+    def preStopButton(ui_obj):
+        print("preStopButton is clicked")
+        ui_obj.LabRightInfo.setText("预停按钮按下")
+        retu = ui_obj.sendOrder("preStop")
+        if retu == 0:
+            print("指令发送成功！！！")
+
+    @staticmethod
+    def parkingButton(ui_obj):
+        print("parkingButton is clicked")
+        ui_obj.LabRightInfo.setText("停车按钮按下")
+        retu = ui_obj.sendOrder("parking")
+        if retu == 0:
+            print("指令发送成功！！！")
+
+
+
 
     @staticmethod
     def saveFigButton(ui_obj):

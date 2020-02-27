@@ -6,6 +6,8 @@
 * @function: 各种接口参数
 '''
 updateTime= 100   #单位毫秒，经测试100最佳，不需要再调
+# note: 指令有预停，灯无预停。
+# 指令无保持姿态，灯有保持姿态
 ## 飞行状态指示灯
 # TODO: 停止灯
 ledFlight = {     # 正确
@@ -16,10 +18,10 @@ ledFlight = {     # 正确
             'stopLed': 11,'keepPostureLed': 13
          }
 #  发动机的指示灯
-ledEngine = {   # TODO: 发动机状态没有预停，但是指示灯有预停
+ledEngine = {   # tag: 发动机状态没有预停，但是指示有预停
             'allLedOff':0,
             'bigCartLed' : 1 ,'ratedLed':2, 'cruiseLed':3, 
-            'slowTrainLed':4, 'idlingLed':5,'preStopLed': 6, 'parkingLed':7
+            'slowTrainLed':4, 'idlingLed':5, 'parkingLed':6
 
          }   
 # 模式指示灯

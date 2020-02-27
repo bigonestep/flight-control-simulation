@@ -18,11 +18,12 @@ from GetDataFromShareMem import getShareMemData   # .so为底层
 #from myFigureCanvas import QmyFigureCanvas
 from dataStack import queue
 from buttonFunc import buttonFunc
-from  ledFunc import ledFlightFunc
+from  ledFunc import (ledFlightFunc, ledEngineFunc, ledModelFunc)
 from conf import (ledFlight, ledEngine, ledModel,
                   orderDict, orderInfo, edit,data,
                   updateTime
                   )
+from updataQTread import FigQThread
 
      
 class QmyMainWindow(QMainWindow): 
@@ -40,24 +41,26 @@ class QmyMainWindow(QMainWindow):
       self.__buildUI()
       ## ==================按钮功能类初始化==================
       # self.buttonFunction = buttonFunc(self)  # 改用静态方法
-      ## ================飞行状态互斥灯======================
+      ## ================飞行状态/发动机状态/模式状态 互斥灯======================
       self.ledFlightFunction = ledFlightFunc(self)
+      self.ledEngineFunction = ledEngineFunc(self)
+      self.ledModelFunction = ledModelFunc(self)
       ## ==================打开共享内存模块=================
       self.ret = -1   # 打开共享内存标志位，若为0，则打开成功，若为-1 -2 则失败，一般读取内存中数据之前都要判断一下
 
       self.get = None
       self.ret = self.openMemory()       #打开共享内存，由于.so使用的为创建内存，则这里一定会成功，即不用失败调用定时器一直创建了。
-      if self.ret == -1:
-         print("打开内存失败！！！")
-         self.LabRightInfo.setText("打开内存失败！！！")
-         #self.openMemTimer.start()
-      elif self.ret == -2:
-         print("指针指向失败！！！")
-         self.LabRightInfo.setText("指针指向失败！！！")
-         #self.openMemTimer.start()
-      else:  
-         print("打开共享内存成功！！！")
-         self.LabRightInfo.setText("打开共享内存成功！！！")
+      # if self.ret == -1:
+      #    print("打开内存失败！！！")
+      #    self.LabRightInfo.setText("打开内存失败！！！")
+      #    #self.openMemTimer.start()
+      # elif self.ret == -2:
+      #    print("指针指向失败！！！")
+      #    self.LabRightInfo.setText("指针指向失败！！！")
+      #    #self.openMemTimer.start()
+      # else:  
+      #    print("打开共享内存成功！！！")
+      #    self.LabRightInfo.setText("打开共享内存成功！！！")
       #self.openMemTimer.start()
       #self.openMemTimer.timeout.connect(self.__ret)
 ## ==================图============================
@@ -86,15 +89,13 @@ class QmyMainWindow(QMainWindow):
       self.ui.psiView.drawFig("偏航角","t(s)",self.psi.queueList)
       
       # 设置小图边距
-      self.ui.heightView.fig.subplots_adjust(right=1, left=0.12, 
-                                             top=1, bottom = 0.2)
       # 设置边距   范围为（0-1）其中右上越大越靠边，左下越小越靠边
-      self.ui.thetaView.fig.subplots_adjust(right=1, left=0.12,
-                                           top=1, bottom = 0.2)
-      self.ui.phiView.fig.subplots_adjust(right=1, left=0.12, 
-                                          top=1, bottom = 0.2)
-      self.ui.psiView.fig.subplots_adjust(right=1, left=0.12, 
-                                          top=1, bottom = 0.2)
+      view = ("heightView", "thetaView", "phiView", "psiView")
+      for i in view:
+         getattr(self.ui, i).fig.subplots_adjust(right=1, left=0.12, 
+                                             top=1, bottom = 0.2)
+      
+
       # =========================绘制 3维曲线 ==========================
       self.X = queue(dotNum)
       self.Y = queue(dotNum)
@@ -112,17 +113,24 @@ class QmyMainWindow(QMainWindow):
 
 
       ## ================指示灯模块初始化=====================
-      self.LedFlightState = 0
-      self.LedProgrameControlState = 0        ## 程控灯的状态为灭的
+      self.ledFlightState = 0
+      self.ledModelState = 0        ## 程控灯的状态为灭的
+      self.ledEngineState = 0
       self.programeControlLed_clicked = False
       self.readData_UpFigure_UpState()
+      
       self.LedTimer = QTimer()
       self.LedTimer.stop()
       self.LedTimer.setInterval(updateTime)   # 100ms
       self.LedTimer.start()
-      self.LedTimer.timeout.connect(self.readData_UpFigure_UpState)  # 刷新指示灯状态 刷新绘图
-
+      self.LedTimer.timeout.connect(self.readData_UpState)  # 刷新指示灯状态 刷新绘图
       
+      self.FigThread = FigQThread(rest = 0.1, obj_ui = self)
+      self.FigThread.daemon=True     # 设置线程为守护线程，即主线程关闭，子线程也关闭
+      self.FigThread.start()
+
+
+
    # ===================状态栏============================
    def __buildUI(self):
       self.LabAircraftInfo = QLabel(self)
@@ -285,9 +293,37 @@ class QmyMainWindow(QMainWindow):
    def on_keepDirectButton_clicked(self):
       buttonFunc.keepDirectButton(self)
 
-      #   
+      #  模式三个按键
    def on_programeControlModelButton_clicked(self):
       buttonFunc.programeControlModelButton(self)
+
+   def on_remoteControlModelButton_clicked(self):
+      buttonFunc.remoteControlModelButton(self)
+
+   def on_internalControlModelButton_clicked(self):
+      buttonFunc.internalControlModelButton(self)
+   
+   # 发动机的灯
+   def on_bigCartButton_clicked(self):
+      buttonFunc.bigCartButton(self)
+
+   def on_ratedButton_clicked(self):
+      buttonFunc.ratedButton(self)
+
+   def on_cruiseButton_clicked(self):
+      buttonFunc.cruiseButton(self)
+
+   def on_slowTrainButton_clicked(self):
+      buttonFunc.slowTrainButton(self)
+
+   def on_idlingButton_clicked(self):
+      buttonFunc.idlingButton(self)
+
+   def on_preStopButton_clicked(self):
+      buttonFunc.preStopButton(self)
+
+   def on_parkingButton_clicked(self):
+      buttonFunc.parkingButton(self)
 
    # 保存图片按钮
    @pyqtSlot()
@@ -301,13 +337,62 @@ class QmyMainWindow(QMainWindow):
 ## ==============自定义函数===============================
    # 设置指示灯的互斥，某一瞬间只有一个亮的
    def ledFlightStateMutex(self,clickled):
-      self.ledFlightFunction.ledFlightState(clickled)
+      self.ledFlightFunction.ledFlight(clickled)
+   # 更新飞行状态指示灯
+   def updataLedFilghtState(self):
+      newFlightStatus = int(self.get.readOrWriteData('acceptFlightStatus','r'))
+      if (self.ledFlightState != newFlightStatus):
+         self.ledFlightState = newFlightStatus
+         if newFlightStatus == ledFlight['stopLed']:
+               self.ledFlightStateMutex('stopLed')
+               self.stopState = True
+         elif newFlightStatus == ledFlight['allLedOff']:
+            self.ledFlightStateMutex('allLedOff')
+         else:
+            newdict = {v: k for k, v in ledFlight.items()}  
+            self.ledFlightStateMutex(newdict[newFlightStatus])
+
+               
+   # 更新发动机灯
+   def ledEngineStateMutex(self,clickled):
+      self.ledEngineFunction.ledEngine(clickled)
+
+   def updataEngineState(self):
+      newEngineState = int(self.get.readOrWriteData('acceptEngineStatus', 'r'))
+      if self.ledEngineState != newEngineState:
+         self.ledEngineState = newEngineState
+         if newEngineState == ledEngine['allLedOff']:
+            self.ledEngineStateMutex('allLedOff')
+         else:
+            newdict = {v: k for k, v in ledEngine.items()}
+            self.ledEngineStateMutex(newdict[newEngineState])
+            
+
+   # 更新模式灯
+   def ledModelStateMutex(self,clickled):
+      self.ledModelFunction.ledModel(clickled)
+
+   def updateLedModelState(self):
+      newModelState = int(self.get.readOrWriteData('acceptModel', 'r'))
+      if  self.ledModelState != newModelState:
+         self.ledModelState = newModelState
+         if newModelState == ledModel['allLedOff']:
+            self.ledModelStateMutex('allLedOff')
+         else:
+            newdict = {v: k for k, v in ledModel.items()}  
+            self.ledModelStateMutex(newdict[newModelState])
+
 
    #显示数据
    def dataShown(self):
          for i, enum in enumerate(edit):
             func = getattr(self.ui, enum).setText
             func("%.2f"%self.para[i])
+
+   def readData_UpState(self):
+      self.updataLedFilghtState()
+      self.updateLedModelState()
+      self.updataEngineState()
 
 
    # 读取内存数据  更新绘图   更新状态灯   该函数为定时执行函数
@@ -336,38 +421,28 @@ class QmyMainWindow(QMainWindow):
          self.drawMapFigure()
          
          # ===============更新飞行状态灯=============================
-         newFlightStatus = int(self.get.readOrWriteData('acceptFlightStatus','r'))
-         newProgrameControlState = int(self.get.readOrWriteData('acceptModel', 'r'))
-         if (self.LedFlightState != newFlightStatus):
-            self.LedFlightState = newFlightStatus
-            if newFlightStatus == ledFlight['stopLed']:
-                  self.ledFlightStateMutex('stopLed')
-                  self.stopState = True
-            elif newFlightStatus == ledFlight['allLedOff']:
-               self.ledFlightStateMutex('allLedOff')
-            else:
-               newdict = {v: k for k, v in ledFlight.items()}  
-               self.ledFlightStateMutex(newdict[newFlightStatus])
-               if self.stopState == True:
-                  self.stopState = False
-                  self.reFig()
-   
-         if  self.LedProgrameControlState != newProgrameControlState:
-            self.LedProgrameControlState = newProgrameControlState   
-            if newProgrameControlState == ledModel['programeControlModelLed']:
-               print("程控灯打开")       # TODO: 这地方要改成模式集体控制
-               self.ui.programeControlModelLed.state = 'on'
-               self.ui.programeControlModelLed.repaint()
-            else:
-               print("程控灯关闭")
-               self.ui.programeControlModelLed.state = 'off'
-               self.ui.programeControlModelLed.repaint()
+         # self.updataLedFilghtState()
+         # self.updateLedModelState()
+         # self.updataEngineState()
+
+         
+         # newProgrameControlState = int(self.get.readOrWriteData('acceptModel', 'r'))
+         # if  self.ledModelState != newProgrameControlState:
+         #    self.ledModelState = newProgrameControlState   
+         #    if newProgrameControlState == ledModel['programeControlModelLed']:
+         #       print("程控灯打开")       # TODO: 这地方要改成模式集体控制
+         #       self.ui.programeControlModelLed.state = 'on'
+         #       self.ui.programeControlModelLed.repaint()
+         #    else:
+         #       print("程控灯关闭")
+         #       self.ui.programeControlModelLed.state = 'off'
+         #       self.ui.programeControlModelLed.repaint()
          retu = 0
       else:
          retu = -1
       return retu
 
-   def judgeFlightState(self, state):
+   def judgeOrder(self, state):
       for i in range(1, len(orderInfo)):
          if state == i:
             self.__LabInfo.setText("发送指令:"+orderInfo[i])
@@ -376,24 +451,13 @@ class QmyMainWindow(QMainWindow):
    def sendOrder(self, order):
       if self.ret == 0:
          self.get.readOrWriteData('send','w',orderDict[order])
-         self.judgeFlightState(orderDict[order])
+         self.judgeOrder(orderDict[order])
          print("写入指令：%d :"% int(self.get.readOrWriteData('send','r'))+ order)
          retu = 0
       else:
          retu = -1
       return retu
    
-   def setProgrameControlOrder(self):
-      if self.ret == 0:
-         if int(self.get.readOrWriteData('acceptModel','r')) != 1:
-            retu = self.get.readOrWriteData('send','w',orderDict['programeControlModel'])    # TODO: 要敲定程控是哪个命令
-            if retu == 0:  
-               self.judgeFlightState(orderDict['programeControlModel'])  
-         else:
-            retu = -1
-      else:
-         retu = 0
-      return retu
 
    # 打开内存，在最前面执行
    def openMemory(self):
@@ -407,7 +471,10 @@ class QmyMainWindow(QMainWindow):
          print("指针指向失败！！！")
       else:
          self.ret = 0
-      return self.ret
+         print("打开共享内存成功！！！")
+         self.LabRightInfo.setText("打开共享内存成功！！！")
+      return self.ret 
+         
 
    def __ret(self):
       if self.ret != 0:
@@ -429,3 +496,4 @@ if  __name__ == "__main__":        #用于当前窗体测试
    form=QmyMainWindow()            #创建窗体
    form.show()
    sys.exit(app.exec_())
+   print("窗体关闭")

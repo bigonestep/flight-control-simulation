@@ -10,10 +10,9 @@
 ## 创建了FigureCanvas和NavigationToolbar，组成一个整体
 ## 便于可视化设计
 
-#import numpy as np
 import sys
 
-
+import numpy as np
 from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QTimer,QMargins
 from PyQt5.QtWidgets import  QWidget
 import matplotlib as mpl
@@ -107,7 +106,7 @@ class QmyFigureCanvas(QWidget):
    # 创建三维曲线
    def createThreeDFigure(self):
 
-      self.figure = figure.Figure(dpi=50)
+      self.figure = figure.Figure(dpi=80)
       figCanvas = FigureCanvas(self.figure)
 
       layout = QVBoxLayout(self)
@@ -135,7 +134,12 @@ class QmyFigureCanvas(QWidget):
       #self.threeFigLine.set_zdata(z)
       ###============================注意=======================
       # set_data_3d函数 只有再matplotlib版本大于3.1.2才有
+      x = np.array(x)
+      y = np.array(y)
+      z = np.array(z)
       self.threeFigLine.set_data_3d(x,y,z)
+      # print("type(x),type(y),type(z)",type(x[0]),type(y[1]),type(z[1]))
+      # print("len(x),len(y),len(z):",len(x),len(y),len(z))
       
       self.ax3D.set_xlim([xmin,xmax])
       self.ax3D.set_ylim([ymin, ymax])
