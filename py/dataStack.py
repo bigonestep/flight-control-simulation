@@ -54,5 +54,5 @@ if __name__ == "__main__":
     num = queue(20)
     for i in range(100):
         num.fun(i)
-        print(num.queueList)
+        # print(num.queueList)
 """

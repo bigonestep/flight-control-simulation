@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <Windows.h>
 
-#define GETSIZE 20
+#define GETSIZE 30
 LPVOID lpbase = NULL;
 HANDLE hmapfile = NULL;
 
@@ -14,10 +14,10 @@ int i;
 
 
 //记录可以使用
-char getMem(void) {
+char getMem(char* str) {
 	int i;
 	int ret = 0;
-	hmapfile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE | SEC_COMMIT, 0, 1024, "szName");
+	hmapfile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE | SEC_COMMIT, 0, 1024, str);
 	if (hmapfile == NULL)
 	{
 		ret = -1;
@@ -84,44 +84,45 @@ double writeData(int num, double f)
 
 
 
-int main()
-{
-	int ret = 0;
-	double j = 0;
-	double w = 0;
-	int i = 0;
+// int main()
+// {
+// 	int ret = 0;
+// 	double j = 0;
+// 	double w = 0;
+// 	int i = 0;
+// 	char* str = "szName";
 
-	double getdata[GETSIZE];
-	double writeNum[GETSIZE];
+// 	double getdata[GETSIZE];
+// 	double writeNum[GETSIZE];
 
 
-	while (1) {
-		ret = getMem();
-		if (ret == -1)
-		{
-			printf("共享内存打开失败！！！\n");
-		}
-		else if (ret == -2) {
-			printf("创建内存指针失败！！！\n");
-			return ret;
-		}
-		else if (ret == 0) {
-			for (i = 0; i < 4; i++)
-			{
-				w = writeData(i, j + i);
-				if (w - (-1)>0.001)
-				{
-					printf("%.2lf,     ", w);
-				}
-			}
+// 	while (1) {
+// 		ret = getMem(str);
+// 		if (ret == -1)
+// 		{
+// 			printf("共享内存打开失败！！！\n");
+// 		}
+// 		else if (ret == -2) {
+// 			printf("创建内存指针失败！！！\n");
+// 			return ret;
+// 		}
+// 		else if (ret == 0) {
+// 			for (i = 0; i < 4; i++)
+// 			{
+// 				w = writeData(i, j + i);
+// 				if (w - (-1)>0.001)
+// 				{
+// 					printf("%.2lf,     ", w);
+// 				}
+// 			}
 
-			j++;
-			printf("%.2lf,     ", writeData(7, 1.0)); ;
-			printf("\n");
+// 			j++;
+// 			printf("%.2lf,     ", writeData(7, 1.0)); ;
+// 			printf("\n");
 
-		}
+// 		}
 
-	}
-	return ret;
+// 	}
+// 	return ret;
 
-}
+// }

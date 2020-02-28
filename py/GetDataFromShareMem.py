@@ -7,7 +7,7 @@
 * @function: 获取数据
 '''
 import sys
-from ctypes import CDLL, POINTER, c_double, c_int
+from ctypes import CDLL, POINTER, c_double, c_int, c_char_p, c_wchar_p
 
 
 data = {
@@ -19,26 +19,27 @@ data = {
 }
 
 class getShareMemData(object):
-    def __init__(self):
+    def __init__(self,szName):
         self.ret_int = 0
+        self.szName = szName
 
     def openShareMem(self):
         self.pylib = CDLL(r'./getShareData.so')
-        self.ret_int = self.pylib.getMem()
+        self.ret_int = self.pylib.getMem(self.szName)
         if self.ret_int == -1:
-            print("共享内存打开失败")
+            # print("共享内存打开失败")
             return -1
         elif self.ret_int == -2:
-            print("共享内存指针错误")
+            # print("共享内存指针错误")
             return -2
         else:
-            print("打开共享内存成功")
+            # print("打开共享内存成功")
             return 0
 
     def closeShareMem(self):
         if self.ret_int == 0:
             self.pylib.closeMem()
-            print("释放成功")
+            # print("释放成功")
 
     def readOrWriteData(self,key, n, *flag):  # x   double R(void);
         '''
@@ -51,9 +52,9 @@ class getShareMemData(object):
         'r': 返回读取的数据，或者错误代码
         'w': 返回错误代码
         '''
-        # print("n:", n, 'key:',key)
+        # # print("n:", n, 'key:',key)
         if (n not in ('r','w')) or key not in data.keys() :
-            print("参数错误：not is 'r' or 'w' 或者 获取数据未在字典里面")
+            # print("参数错误：not is 'r' or 'w' 或者 获取数据未在字典里面")
             return -1
         if n == 'r':
             double_ret = self.pylib.readData
@@ -63,7 +64,7 @@ class getShareMemData(object):
             if int(x_double) != -1: # 说明读取失败
                 return x_double
             else:
-                print("读取数据失败")
+                # print("读取数据失败")
                 return -1  
         elif n == 'w':
 
@@ -80,6 +81,7 @@ class getShareMemData(object):
             if ret_flag != 0:
                 print("写入数据失败")
             else:
+                
                 print("写入数据成功")
             return ret_flag
     
@@ -93,24 +95,24 @@ class getShareMemData(object):
 
 
 
-if __name__ == '__main__':
-    i = 0
-    dataList = []
-    get = getShareMemData()
-    get.openShareMem()
-    data = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
-    while(1):
-        get = getShareMemData()
-        ret= get.openShareMem()
-        data = get.readAll()
-        if ret == 0:
-            for i in range(5):
-                print("%.2f      " % float(data[i]),end='')
-            print("")
+# if __name__ == '__main__':
+#     i = 0
+#     dataList = []
+#     get = getShareMemData()
+#     get.openShareMem()
+#     data = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+#     while(1):
+#         get = getShareMemData()
+#         ret= get.openShareMem()
+#         data = get.readAll()
+#         if ret == 0:
+#             for i in range(5):
+#                 print("%.2f      " % float(data[i]),end='')
+#             print("")
             
-        else:
-            print("打开失败")
-        get.closeShareMem()
+#         else:
+#             print("打开失败")
+#         get.closeShareMem()
 
 
         

@@ -9,7 +9,7 @@ updateTime= 100   #单位毫秒，经测试100最佳，不需要再调
 # note: 指令有预停，灯无预停。
 # 指令无保持姿态，灯有保持姿态
 ## 飞行状态指示灯
-# TODO: 停止灯
+
 ledFlight = {     # 正确
             'allLedOff':0, 'takeOffLed':1, 'landingLed':2,
             'climb1Led':3, 'decline1Led':4, 'climb2Led':5,
@@ -25,7 +25,7 @@ ledEngine = {   # tag: 发动机状态没有预停，但是指示有预停
 
          }   
 # 模式指示灯
-ledModel = {    # TODO: 和指令顺序不一样
+ledModel = {    # note: 和指令顺序不一样
             'allLedOff': 0,
             'programeControlModelLed':1,"remoteControlModelLed":2, "internalControlModelLed":3
             } 
@@ -46,8 +46,8 @@ orderDict = {
 orderInfo = (
             u"无指令",
             u"遥控",u"程控",u"内控",
-            u"起飞", u"着陆",u"爬升1", u"下滑1", u"爬升2",
-            u"下滑2", u"左转", u"右转",u"定高平行", u"定向飞行", 
+            u"起飞", u"着陆",u"爬升1", u"爬升2", u"下滑1", 
+            u"下滑2", u"定高平行", u"左转", u"右转", u"定向飞行", 
             u"大车", u"额定", u"巡航", u"慢车", u"怠速", u"预停", u"停车"
    )
 

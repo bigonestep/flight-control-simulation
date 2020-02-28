@@ -11,8 +11,7 @@
 ## 便于可视化设计
 
 import sys
-
-import numpy as np
+from numpy import array
 from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QTimer,QMargins
 from PyQt5.QtWidgets import  QWidget
 import matplotlib as mpl
@@ -31,7 +30,7 @@ import matplotlib.image as img
 
 
 class QmyFigureCanvas(QWidget):
-   
+   mapChanged = pyqtSignal(str)   # 发送一个地图名称
    def __init__(self, parent=None, toolbarVisible=True,showHint=False):
 
       '''
@@ -52,6 +51,10 @@ class QmyFigureCanvas(QWidget):
       self.bgimg = img.imread(r'./map/1.png')   # 地图的画图的背景
 
       self.t = None   #二维图的x轴序列
+
+      
+
+      
 
 
 
@@ -90,8 +93,7 @@ class QmyFigureCanvas(QWidget):
       self.lineFig = self.ax1.plot(self.t, y, '-', label="height", linewidth=1)[0]  # 绘制一条曲线
       self.ax1.set_xlabel(x_name)  # X轴标题
       self.ax1.set_ylabel(name)  # Y轴标题
-      #self.ax1.set_xlim([x_min, x_max])  # X轴坐标范围
-      #self.ax1.set_ylim([y_min, y_max])  # Y轴坐标范围
+      
       self.fig.canvas.draw()
    def updateFig(self, y, y_min, y_max, x_min, x_max):
       self.lineFig.set_xdata(self.t)
@@ -113,6 +115,7 @@ class QmyFigureCanvas(QWidget):
       layout.addWidget(figCanvas)      #添加FigureCanvas对象
       layout.setContentsMargins(0,0,0,0)
       layout.setSpacing(0)
+      
 
 
    # 3维曲线初始设置
@@ -129,17 +132,12 @@ class QmyFigureCanvas(QWidget):
       self.ax3D.set_zlabel("H")
       self.figure.canvas.draw()
    def updataThreeFig(self,x,y,z,xmin,xmax,ymin,ymax,zmin,zmax):
-      #self.threeFigLine.set_xdata(x)
-      #self.threeFigLine.set_ydata(y)
-      #self.threeFigLine.set_zdata(z)
       ###============================注意=======================
       # set_data_3d函数 只有再matplotlib版本大于3.1.2才有
-      x = np.array(x)
-      y = np.array(y)
-      z = np.array(z)
+      x = array(x)
+      y = array(y)
+      z = array(z)
       self.threeFigLine.set_data_3d(x,y,z)
-      # print("type(x),type(y),type(z)",type(x[0]),type(y[1]),type(z[1]))
-      # print("len(x),len(y),len(z):",len(x),len(y),len(z))
       
       self.ax3D.set_xlim([xmin,xmax])
       self.ax3D.set_ylim([ymin, ymax])
@@ -150,7 +148,6 @@ class QmyFigureCanvas(QWidget):
    def createMapFigure(self):
       self.figure = figure.Figure(dpi=80)
       self.figure.clear()
-
       self.figure.figimage(self.bgimg)
       figCanvas = FigureCanvas(self.figure)
       #self.figure.subplots_adjust(bottom=0,right=1, top=1, left=0)   #x y轴都不显示
@@ -161,6 +158,10 @@ class QmyFigureCanvas(QWidget):
       layout.setContentsMargins(0,0,0,0)
       layout.setSpacing(0)
 
+      self.lastMapName = '1.png'
+      self.mapChanged.connect(self.do_mapChange)    # 绑定地图改变函数
+      
+   # 绘制地图
    def drawMapFig(self,x,y):
       self.axMap.cla()
       self.axMap.patch.set_alpha(0)
@@ -168,12 +169,66 @@ class QmyFigureCanvas(QWidget):
       self.axMap.set_xlabel("X")
       self.axMap.set_ylabel("Y")
       self.figure.canvas.draw()
+   # 更新地图数据
    def updataMapFig(self,x,y,xmin,xmax,ymin,ymax):
       self.mapFigLine.set_xdata(x)
       self.mapFigLine.set_ydata(y)
       self.axMap.set_xlim([xmin, xmax])
       self.axMap.set_ylim([ymin, ymax])
       self.figure.canvas.draw()
+
+
+   # 更换地图背景的信号
+   # 思想为根据x轴的距离来更换
+   def mapAxis(self,list):
+      max_axis = max(list)
+      min_axis = min(list)
+      if max_axis < 500:
+         min_axis = 0
+         max_axis = 600
+         self.mapChanged.emit('./map/1.png')
+      elif max_axis < 1000:
+         self.mapChanged.emit('./map/2.png')
+         max_axis = 1000
+         min_axis = 400
+      elif max_axis < 1500:
+         max_axis = 1500
+         min_axis = 900
+         self.mapChanged.emit('./map/3.png')
+      elif max_axis <2000:
+         max_axis = 2000
+         min_axis = 1400
+         self.mapChanged.emit('./map/4.png')
+      elif max_axis < 2500:
+         max_axis = 2500
+         min_axis = 1900
+         self.mapChanged.emit('./map/5.png')
+      elif max_axis <3000:
+         max_axis = 3000
+         min_axis = 2400
+         self.mapChanged.emit('./map/6.png')
+      elif max_axis <3500:
+         max_axis = 3500
+         min_axis = 2900
+         self.mapChanged.emit('./map/7.png')
+      elif max_axis <4000:
+         max_axis = 4000
+         min_axis = 3400
+         self.mapChanged.emit('./map/8.png')
+      else:
+         max_axis += 500
+         min_axis = 3900
+      return min_axis,max_axis
+
+   # 更换地图背景的槽函数
+   @pyqtSlot(str)
+   def do_mapChange(self,mapName):
+      if mapName != self.lastMapName:
+         self.lastMapName = mapName
+         self.bgimg = img.imread(mapName)
+         self.figure.figimage(self.bgimg)
+   
+
 
 
 

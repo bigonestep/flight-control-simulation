@@ -6,11 +6,15 @@
 * @Last Modified time: 2020-02-26 02:08:04  
 * @function:  联合仿真界面
 '''
+# TODO: 优化多线程，文件放文件夹里面，注意备份
 import sys, os
 import time
-from PyQt5.QtWidgets import  (QApplication, QMainWindow,QLabel,QMessageBox)
-from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QTimer,QMargins
-import numpy as np
+from PyQt5.QtWidgets import  (QApplication, QMainWindow,QLabel,QMessageBox,
+                              QInputDialog, QLineEdit)
+from PyQt5.QtCore import  (pyqtSlot,pyqtSignal,Qt,QTimer,QMargins,QCoreApplication, 
+                              QVersionNumber, Qt, QT_VERSION_STR)
+from PyQt5.QtGui import QFont
+from numpy import linspace 
 import matplotlib.image as img
 from ui_MainRhapsody import Ui_MainRhapsody
 from GetDataFromShareMem import getShareMemData   # .so为底层
@@ -21,20 +25,22 @@ from buttonFunc import buttonFunc
 from  ledFunc import (ledFlightFunc, ledEngineFunc, ledModelFunc)
 from conf import (ledFlight, ledEngine, ledModel,
                   orderDict, orderInfo, edit,data,
-                  updateTime
-                  )
+                  updateTime)
+                  
 from updataQTread import FigQThread
 
      
 class QmyMainWindow(QMainWindow): 
-   mapChanged = pyqtSignal(str)   # 发送一个地图名称
+
    def __init__(self, parent=None):
       super().__init__(parent)   # 调用父类构造函数，创建窗体
       self.ui=Ui_MainRhapsody()    # 创建UI对象
       self.ui.setupUi(self)      # 构造UI界面
+      self.ui.splitter.setStretchFactor(0, 2)
+      self.ui.splitter.setStretchFactor(0, 5)
       self.setCentralWidget(self.ui.splitter)
       
-
+      
       # 记录上一个状态是否为stop状态
       self.stopState = False
       ## ==================添加状态栏========================
@@ -46,25 +52,16 @@ class QmyMainWindow(QMainWindow):
       self.ledEngineFunction = ledEngineFunc(self)
       self.ledModelFunction = ledModelFunc(self)
       ## ==================打开共享内存模块=================
+      self.key = None    # 打开内存密匙
       self.ret = -1   # 打开共享内存标志位，若为0，则打开成功，若为-1 -2 则失败，一般读取内存中数据之前都要判断一下
-
       self.get = None
       self.ret = self.openMemory()       #打开共享内存，由于.so使用的为创建内存，则这里一定会成功，即不用失败调用定时器一直创建了。
-      # if self.ret == -1:
-      #    print("打开内存失败！！！")
-      #    self.LabRightInfo.setText("打开内存失败！！！")
-      #    #self.openMemTimer.start()
-      # elif self.ret == -2:
-      #    print("指针指向失败！！！")
-      #    self.LabRightInfo.setText("指针指向失败！！！")
-      #    #self.openMemTimer.start()
-      # else:  
-      #    print("打开共享内存成功！！！")
-      #    self.LabRightInfo.setText("打开共享内存成功！！！")
-      #self.openMemTimer.start()
-      #self.openMemTimer.timeout.connect(self.__ret)
-## ==================图============================
-      self.para = [0.0,0.0,0.0,0.0]    # 必须保留这句话，保证para参数为double型
+
+
+
+## ==================以下为绘图区============================
+
+      self.para = [0.0]    # 必须保留这句话，保证para参数为double型
       self.time1 = 0
       # 绘图数据初始化
       self.T = 0
@@ -78,25 +75,25 @@ class QmyMainWindow(QMainWindow):
       self.ui.thetaView.createFigure()
       self.ui.phiView.createFigure()
       self.ui.psiView.createFigure()
-      self.ui.heightView.t = np.linspace(0, 10, dotNum)   #np.linspace的含义为  0-10范围内均等取30个数
-      self.ui.thetaView.t = np.linspace(0, 10, dotNum)
-      self.ui.phiView.t = np.linspace(0, 10, dotNum)
-      self.ui.psiView.t = np.linspace(0,10,dotNum)
+      self.ui.heightView.t = linspace(0, 10, dotNum)   #linspace的含义为  0-10范围内均等取30个数
+      self.ui.thetaView.t = linspace(0, 10, dotNum)
+      self.ui.phiView.t = linspace(0, 10, dotNum)
+      self.ui.psiView.t = linspace(0,10,dotNum)
 
-      self.ui.heightView.drawFig("高度","t(s)",self.H.queueList )
-      self.ui.thetaView.drawFig("俯仰角","t(s)",self.theta.queueList)
-      self.ui.phiView.drawFig("滚转角","t(s)",self.phi.queueList)
-      self.ui.psiView.drawFig("偏航角","t(s)",self.psi.queueList)
+      self.ui.heightView.drawFig(u"高度","t(s)",self.H.queueList )
+      self.ui.thetaView.drawFig(u"俯仰角","t(s)",self.theta.queueList)
+      self.ui.phiView.drawFig(u"滚转角","t(s)",self.phi.queueList)
+      self.ui.psiView.drawFig(u"偏航角","t(s)",self.psi.queueList)
       
       # 设置小图边距
       # 设置边距   范围为（0-1）其中右上越大越靠边，左下越小越靠边
       view = ("heightView", "thetaView", "phiView", "psiView")
       for i in view:
-         getattr(self.ui, i).fig.subplots_adjust(right=1, left=0.12, 
+         getattr(self.ui, i).fig.subplots_adjust(right=1, left=0.17, 
                                              top=1, bottom = 0.2)
       
 
-      # =========================绘制 3维曲线 ==========================
+      # =========================绘制 3维曲线初始化 ==========================
       self.X = queue(dotNum)
       self.Y = queue(dotNum)
 
@@ -105,29 +102,29 @@ class QmyMainWindow(QMainWindow):
       self.ui.threeDView.drawThreeFig(self.X.queueList,self.Y.queueList,self.H.queueList)
 
 
-      #=========================绘制地图曲线 ===========================
-      self.lastMapName = '1.png'
+      #=========================绘制地图曲线初始化 ===========================
+      
       self.ui.mapView.createMapFigure()
       self.ui.mapView.drawMapFig(self.X.queueList,[-i for i in self.Y.queueList])
-      self.mapChanged.connect(self.do_mapChange)
-
-
+   
       ## ================指示灯模块初始化=====================
       self.ledFlightState = 0
       self.ledModelState = 0        ## 程控灯的状态为灭的
       self.ledEngineState = 0
       self.programeControlLed_clicked = False
       self.readData_UpFigure_UpState()
-      
+      ## ================== 定时更新状态灯======================
       self.LedTimer = QTimer()
       self.LedTimer.stop()
       self.LedTimer.setInterval(updateTime)   # 100ms
       self.LedTimer.start()
-      self.LedTimer.timeout.connect(self.readData_UpState)  # 刷新指示灯状态 刷新绘图
-      
+      self.LedTimer.timeout.connect(self.upLedState)  # 刷新指示灯状态
+      ## =================打开绘图进程================================
       self.FigThread = FigQThread(rest = 0.1, obj_ui = self)
-      self.FigThread.daemon=True     # 设置线程为守护线程，即主线程关闭，子线程也关闭
+      # self.FigThread.daemon=True     # 设置线程为守护线程，即主线程关闭，子线程也关闭
+      # 这里不用设置守护进程，因为子进程手动关闭了
       self.FigThread.start()
+
 
 
 
@@ -135,17 +132,17 @@ class QmyMainWindow(QMainWindow):
    def __buildUI(self):
       self.LabAircraftInfo = QLabel(self)
       self.LabAircraftInfo.setMinimumWidth(300)
-      self.LabAircraftInfo.setText("当前飞机状态：")
+      self.LabAircraftInfo.setText(u"当前飞机状态：")
       self.ui.statusbar.addWidget(self.LabAircraftInfo)
       
       self.__LabInfo = QLabel(self)
       self.__LabInfo.setMinimumWidth(300)
-      self.__LabInfo.setText("指令发送：")
+      self.__LabInfo.setText(u"指令发送：")
       self.ui.statusbar.addWidget(self.__LabInfo)
 
       # 最右侧1050
       self.LabRightInfo = QLabel(self)
-      self.LabRightInfo.setText("")
+      self.LabRightInfo.setText(u"")
       self.ui.statusbar.addPermanentWidget(self.LabRightInfo)
 
    #====================高度图等四个图============================
@@ -184,55 +181,8 @@ class QmyMainWindow(QMainWindow):
                                    self.xmin,self.xmax,self.ymin,self.ymax,self.H_min, self.H_max )
 
    # ====================地图曲线========================
-   def mapAxis(self,list):
-      max_axis = max(list)
-      min_axis = min(list)
-      if max_axis < 500:
-         min_axis = 0
-         max_axis = 600
-         self.mapChanged.emit('./map/1.png')
-      elif max_axis < 1000:
-         self.mapChanged.emit('./map/2.png')
-         max_axis = 1000
-         min_axis = 400
-      elif max_axis < 1500:
-         max_axis = 1500
-         min_axis = 900
-         self.mapChanged.emit('./map/3.png')
-      elif max_axis <2000:
-         max_axis = 2000
-         min_axis = 1400
-         self.mapChanged.emit('./map/4.png')
-      elif max_axis < 2500:
-         max_axis = 2500
-         min_axis = 1900
-         self.mapChanged.emit('./map/5.png')
-      elif max_axis <3000:
-         max_axis = 3000
-         min_axis = 2400
-         self.mapChanged.emit('./map/6.png')
-      elif max_axis <3500:
-         max_axis = 3500
-         min_axis = 2900
-         self.mapChanged.emit('./map/7.png')
-      elif max_axis <4000:
-         max_axis = 4000
-         min_axis = 3400
-         self.mapChanged.emit('./map/8.png')
-      else:
-         max_axis += 500
-         min_axis = 3900
-      return min_axis,max_axis
-   # 更新地图的槽函数
-   @pyqtSlot(str)
-   def do_mapChange(self,mapName):
-      if mapName != self.lastMapName:
-         self.lastMapName = mapName
-         self.ui.mapView.bgimg = img.imread(mapName)
-         self.ui.mapView.figure.figimage(self.ui.mapView.bgimg)
-
    def drawMapFigure(self):
-      xmin, xmax = self.mapAxis(self.X.queueList)
+      xmin, xmax = self.ui.mapView.mapAxis(self.X.queueList)
       tep = max(abs(self.ymin),abs(self.ymax))
       ymin = -tep
       ymax = tep
@@ -244,18 +194,24 @@ class QmyMainWindow(QMainWindow):
 ##  ==============event处理函数==========================
    # 窗口关闭的事件重写
    def closeEvent(self,event):
-      dlgTitle = "警告"
-      strInfo = "是否退出联合仿真系统？"
+      dlgTitle = u"警告"
+      strInfo = u"是否退出联合仿真系统？"
       defaultBtn = QMessageBox.NoButton
       result = QMessageBox.question(self,dlgTitle, strInfo, 
       QMessageBox.Yes|QMessageBox.No,defaultBtn)
       if (result == QMessageBox.Yes):
-         self.get.closeShareMem()
-         print("关闭共享内存成功")
-         self.LabRightInfo.setText("关闭共享内存成功")
+         if self.key:
+            self.FigThread.closeThread = True
+            time.sleep(0.3)
+            # 等待进入线程中关闭线程
+            self.get.closeShareMem()
+            print("关闭共享内存成功")
+            self.LabRightInfo.setText(u"关闭共享内存成功")
          event.accept()
       else:
          event.ignore()
+   
+
 
 
 ##  ==========由connectSlotsByName()自动连接的槽函数============ 
@@ -382,14 +338,16 @@ class QmyMainWindow(QMainWindow):
             newdict = {v: k for k, v in ledModel.items()}  
             self.ledModelStateMutex(newdict[newModelState])
 
-
-   #显示数据
-   def dataShown(self):
+   #更新显示数据函数
+   def dataShow(self):
          for i, enum in enumerate(edit):
             func = getattr(self.ui, enum).setText
             func("%.2f"%self.para[i])
-
-   def readData_UpState(self):
+   
+   # 定制更新指示灯和界面数据
+   def upLedState(self):
+      # 显示数据
+      self.dataShow()
       self.updataLedFilghtState()
       self.updateLedModelState()
       self.updataEngineState()
@@ -404,14 +362,13 @@ class QmyMainWindow(QMainWindow):
          self.theta.updata(self.para[data['theta']])
          self.phi.updata(self.para[data['phi']])
          self.psi.updata(self.para[data['psi']])
-         self.ui.heightView.t = np.linspace(self.T, self.T + 10,  len(self.H.queueList))
-         self.ui.thetaView.t = np.linspace(self.T, self.T + 10, len(self.theta.queueList))
-         self.ui.phiView.t = np.linspace(self.T, self.T + 10, len(self.phi.queueList))
-         self.ui.psiView.t = np.linspace(self.T, self.T + 10, len(self.psi.queueList))
+         self.ui.heightView.t = linspace(self.T, self.T + 10,  len(self.H.queueList))
+         self.ui.thetaView.t = linspace(self.T, self.T + 10, len(self.theta.queueList))
+         self.ui.phiView.t = linspace(self.T, self.T + 10, len(self.phi.queueList))
+         self.ui.psiView.t = linspace(self.T, self.T + 10, len(self.psi.queueList))
          self.drawFigure()
          self.T += 0.1
-         # 显示数据
-         self.dataShown()
+         
          #===========3维数据更新====================
          self.X.updata(self.para[data['X']])
          self.Y.updata(self.para[data['Y']])
@@ -419,24 +376,6 @@ class QmyMainWindow(QMainWindow):
 
          # =============地图更新=====================
          self.drawMapFigure()
-         
-         # ===============更新飞行状态灯=============================
-         # self.updataLedFilghtState()
-         # self.updateLedModelState()
-         # self.updataEngineState()
-
-         
-         # newProgrameControlState = int(self.get.readOrWriteData('acceptModel', 'r'))
-         # if  self.ledModelState != newProgrameControlState:
-         #    self.ledModelState = newProgrameControlState   
-         #    if newProgrameControlState == ledModel['programeControlModelLed']:
-         #       print("程控灯打开")       # TODO: 这地方要改成模式集体控制
-         #       self.ui.programeControlModelLed.state = 'on'
-         #       self.ui.programeControlModelLed.repaint()
-         #    else:
-         #       print("程控灯关闭")
-         #       self.ui.programeControlModelLed.state = 'off'
-         #       self.ui.programeControlModelLed.repaint()
          retu = 0
       else:
          retu = -1
@@ -445,7 +384,7 @@ class QmyMainWindow(QMainWindow):
    def judgeOrder(self, state):
       for i in range(1, len(orderInfo)):
          if state == i:
-            self.__LabInfo.setText("发送指令:"+orderInfo[i])
+            self.__LabInfo.setText(u"发送指令:"+orderInfo[i])
 
          
    def sendOrder(self, order):
@@ -458,21 +397,50 @@ class QmyMainWindow(QMainWindow):
          retu = -1
       return retu
    
+   def keyInputWindow(self):
+      font = QFont()
+      font.setPointSize(20)
+      dlgTitle = u"请输入联合系统密匙"
+      txtLable = u"请仔细检查填写的密匙, 如未能取得正确数据,\n请关闭系统，然后重新填写密匙。"
+      defautInput = u"szName"
 
+      echoMode = QLineEdit.Normal
+      key, ok = QInputDialog.getText(self, dlgTitle,txtLable,echoMode, defautInput)
+      if (ok):
+         print("key:",key)
+         return key.encode("utf-8")
+      else: 
+         dlgTitle = u"警告"
+         strInfo = u"默认使用 \"szName\" 为密匙"
+         defaultBtn = QMessageBox.No
+         result = QMessageBox.information(self, dlgTitle, strInfo,
+                                 QMessageBox.Yes|QMessageBox.No,defaultBtn)
+         if (result == QMessageBox.Yes):
+            return "szName".encode("utf-8")
+         else:
+            return None                              
+
+         
    # 打开内存，在最前面执行
    def openMemory(self):
-      self.get = getShareMemData()
+      while not self.key:
+         self.key = self.keyInputWindow()
+         if not self.key:
+            dlgTitle = u"警告"
+            strInfo = u"密匙不能为空！！！"
+            QMessageBox.information(self, dlgTitle, strInfo)
+      self.get = getShareMemData(self.key)
       self.ret = self.get.openShareMem()
       if self.ret == -1:
          print("打开内存失败！！！")
-         self.LabRightInfo.setText("打开内存失败！！！")
+         self.LabRightInfo.setText(u"打开内存失败！！！")
       elif self.ret == -2:
-         self.LabRightInfo.setText("指针指向失败！！！")
+         self.LabRightInfo.setText(u"指针指向失败！！！")
          print("指针指向失败！！！")
       else:
          self.ret = 0
          print("打开共享内存成功！！！")
-         self.LabRightInfo.setText("打开共享内存成功！！！")
+         self.LabRightInfo.setText(u"打开共享内存成功！！！")
       return self.ret 
          
 
@@ -489,11 +457,30 @@ class QmyMainWindow(QMainWindow):
 
 
 
+
 ##  ============窗体测试程序 ================================
 
 if  __name__ == "__main__":        #用于当前窗体测试
+   QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
    app = QApplication(sys.argv)    #创建GUI应用程序
+   
    form=QmyMainWindow()            #创建窗体
    form.show()
    sys.exit(app.exec_())
    print("窗体关闭")
+
+# if __name__ == "__main__":
+#    v_compare = QVersionNumber(5,6,0)
+#    v_current,_ = QVersionNumber.fromString(QT_VERSION_STR) #获取当前Qt版本
+#    if QVersionNumber.compare(v_current,v_compare) >=0 :
+#       QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)  #Qt从5.6.0开始，支持High-DPI
+#       app = QApplication(sys.argv)  #
+#    else:
+#       app = QApplication(sys.argv)
+#       font = QFont("宋体")
+#       pointsize = font.pointSize()
+#       font.setPixelSize(pointsize*90/72)
+#       app.setFont(font)
+#    mymainwin = QmyMainWindow()
+#    mymainwin.show()
+#    sys.exit(app.exec())

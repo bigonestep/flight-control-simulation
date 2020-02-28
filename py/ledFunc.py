@@ -42,7 +42,7 @@ class ledFlightFunc(object):
                 obj.state = 'off'
                 obj.repaint()
 
-# 发动机灯控制    # TODO: 要问清有没有预停
+# 发动机灯控制    灯有预停
 ledEngineTuple = ('bigCartLed' ,'ratedLed', 'cruiseLed', 'slowTrainLed', 
                   'idlingLed', 'parkingLed')
 ledEngineInfo = (u'大车', u'额定', u'巡航', u'慢车', u'怠速', u'停车')

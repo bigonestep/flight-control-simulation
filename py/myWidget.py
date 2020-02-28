@@ -12,20 +12,14 @@ import sys,os
 from PyQt5.QtWidgets import  QApplication, QWidget,QMessageBox,QMainWindow,QFileDialog
 #from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QPainter,QPixmap
-from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QDir
+from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QDir, QCoreApplication, QT_VERSION_STR
 import win32api
+from multiprocessing import Process
 
 
 ##from PyQt5.QtWidgets import  
 
 from PyQt5.QtGui import QIcon
-
-##from PyQt5.QtSql import 
-
-##from PyQt5.QtMultimedia import
-
-##from PyQt5.QtMultimediaWidgets import
-
 
 
 from myMainWindow import QmyMainWindow
@@ -80,6 +74,8 @@ class QmyWidget(QMainWindow):
                                  )
                         
       if (result == QMessageBox.Yes):
+      #TODO: 添加关闭上一个窗口的命令
+         
          event.accept()
       else:
          event.ignore()
@@ -89,7 +85,7 @@ class QmyWidget(QMainWindow):
    def on_pycharmButton_clicked(self):
       # 该函数为打开pycharm按键的槽函数，即按下按键会执行该函数
 
-      '''
+      u'''
        #判断文件是否存在，若存在则再判断，路径是否正确，方法判断路径里面是否含有"pycharm"，该方法不严谨，但基本够用，
        若无误则使用win32api.ShellExecute（）函数打开
        若不存在则调用打开文件窗口，选择程序打开,若选择的不是指定软件，则弹出警告窗口。需要重新选择
@@ -101,59 +97,59 @@ class QmyWidget(QMainWindow):
             win32api.ShellExecute(0, 'open', self.pycharmPath, self.pyProjectPath, '', 1)#其中前两个为固定，第三个为打开软件的路径，
                                                                                           # 第四个是使用该软件打开该文件（或文件夹）
                                                                                           # 若没有则放空字符 ''
-            print("打开PyCharm成功！！！")
+            # print("打开PyCharm成功！！！")
       else:
          curPath = QDir.currentPath()
-         dlgTitle = "打开PyCharm软件"
-         filt = "执行程序(*.exe);;所有文件(*.*)"
+         dlgTitle = u"打开PyCharm软件"
+         filt = u"执行程序(*.exe);;所有文件(*.*)"
          filename,filtUsed=QFileDialog.getOpenFileName(self,dlgTitle,curPath,filt)
          if "pycharm" in filename.lower():
             win32api.ShellExecute(0, 'open', filename, '', '', 1)
          elif  filename == '':
             pass
          else:
-            dlgTitle="打开错误"
-            strInfo="请打开PyCharm程序"
+            dlgTitle=u"打开错误"
+            strInfo=u"请打开PyCharm程序"
             QMessageBox.critical(self, dlgTitle, strInfo)
 
             
          
    @pyqtSlot()
    def on_matlabButton_clicked(self):
-      print("matlab")
+      # print("matlab")
       if os.path.isfile(self.matlabPath) and os.path.isdir(self.matlabProjectPath):
-         print("os.path.isfile(self.matlabPath)")
+         # print("os.path.isfile(self.matlabPath)")
          if "matlab" in self.matlabPath.lower():
-            print("")
+            # print("")
             win32api.ShellExecute(0, 'open', self.matlabPath, self.matlabProjectPath, '', 1)
-            print("打开matlab成功！！！")
+            # print("打开matlab成功！！！")
       else:
          curPath = QDir.currentPath()
-         dlgTitle = "打开MatLab软件"
-         filt = "执行程序(*.exe);;所有文件(*.*)"
+         dlgTitle = u"打开MatLab软件"
+         filt = u"执行程序(*.exe);;所有文件(*.*)"
          filename,filtUsed=QFileDialog.getOpenFileName(self,dlgTitle,curPath,filt)
          if "matlab" in filename.lower():
             win32api.ShellExecute(0, 'open', filename, '', '', 1)
          elif  filename == '':
             pass
          else:
-            dlgTitle="打开错误"
-            strInfo="请打开MatLab程序"
+            dlgTitle=u"打开错误"
+            strInfo=u"请打开MatLab程序"
             QMessageBox.critical(self, dlgTitle, strInfo)
 
       
 
    @pyqtSlot()
    def on_RhapsodyButton_clicked(self):
-      print("Rh")
+      # print("Rh")
       if os.path.isfile(self.RhapsodyPath) and os.path.isfile(self.RhapsodyProjectPath):
          if "rhapsody" in self.RhapsodyPath.lower() and '.rpy' in self.RhapsodyProjectPath:
             win32api.ShellExecute(0, 'open',self.RhapsodyPath, self.RhapsodyProjectPath, '', 1)
-            print("打开rhapsody成功！！！")
+            # print("打开rhapsody成功！！！")
       else:
          curPath = QDir.currentPath()
-         dlgTitle = "打开Rhapsody软件"
-         filt = "执行程序(*.exe);;所有文件(*.*)"
+         dlgTitle = u"打开Rhapsody软件"
+         filt = u"执行程序(*.exe);;所有文件(*.*)"
          filename,filtUsed=QFileDialog.getOpenFileName(self,dlgTitle,curPath,filt)
          if "rhapsody" in filename.lower():
             #os.system('"'+filename+'"')
@@ -161,19 +157,34 @@ class QmyWidget(QMainWindow):
          elif  filename == '':
             pass
          else:
-            dlgTitle="打开错误"
-            strInfo="请打开Rhapsody程序"
+            dlgTitle=u"打开错误"
+            strInfo=u"请打开Rhapsody程序"
             QMessageBox.critical(self, dlgTitle, strInfo)
 
    @pyqtSlot()
    def on_mainSystemButton_clicked(self):
       '''打开控制界面的槽函数'''
-      #app = QApplication(sys.argv)    #创建GUI应用程序
-      form=QmyMainWindow(self)            #创建窗体
-      form.setAttribute(Qt.WA_DeleteOnClose)
-
-      form.show()
       
+      # form=QmyMainWindow(self)            #创建窗体
+      # form.setAttribute(Qt.WA_DeleteOnClose)
+      # form.show()
+      
+      # win32api.ShellExecute(0, 'open',"python", "./myMainWindow.py", '', 1)
+      mainWindow = MainWindow()
+      mainWindow.start()
+
+class MainWindow(Process):
+   def __init__(self):
+      Process.__init__(self)
+
+   def run(self):     
+      while True:
+         QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+         app = QApplication(sys.argv)    #创建GUI应用程序
+         
+         form=QmyMainWindow()            #创建窗体
+         form.show()
+         sys.exit(app.exec_())
       
 
 
@@ -186,6 +197,7 @@ class QmyWidget(QMainWindow):
    
 ##  ============窗体测试程序 ================================
 if  __name__ == "__main__":        #用于当前窗体测试
+   QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
    app = QApplication(sys.argv)    #创建GUI应用程序
    form=QmyWidget()                #创建窗体
    
