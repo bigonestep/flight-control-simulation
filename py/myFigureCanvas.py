@@ -50,6 +50,7 @@ class QmyFigureCanvas(QWidget):
         self.bgimg = img.imread(r'./map/1.png')  # 地图的画图的背景
 
         self.t = None  # 二维图的x轴序列
+        self.figImg = None
 
     #  ==============自定义功能函数========================
     def createFigure(self):
@@ -139,7 +140,7 @@ class QmyFigureCanvas(QWidget):
 
         self.figure = figure.Figure(dpi=80)
         self.figure.clear()
-        self.figure.figimage(self.bgimg, zorder=10)
+        self.figImg = self.figure.figimage(self.bgimg, zorder=10)
 
         figCanvas = FigureCanvas(self.figure)
         # self.figure.subplots_adjust(bottom=0,right=1, top=1, left=0)   #x y轴都不显示
@@ -222,4 +223,4 @@ class QmyFigureCanvas(QWidget):
         if mapName != self.lastMapName:
             self.lastMapName = mapName
             self.bgimg = img.imread(mapName)
-            self.figure.figimage(self.bgimg, zorder=10)
+            self.figImg.set_data(zorder=10)
