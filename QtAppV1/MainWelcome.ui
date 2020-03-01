@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="res.qrc">
-    <normaloff>:/icons/Img/Icon 6.ico</normaloff>:/icons/Img/Icon 6.ico</iconset>
+    <normaloff>:/icons/Img/a128.ico</normaloff>:/icons/Img/a128.ico</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="minimumSize">

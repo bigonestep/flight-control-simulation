@@ -281,7 +281,7 @@
           </widget>
          </item>
          <item row="1" column="3">
-          <widget class="QPushButton" name="saveConf_2">
+          <widget class="QPushButton" name="saveConfButton">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -1582,30 +1582,6 @@
            <bool>false</bool>
           </property>
           <layout class="QGridLayout" name="gridLayout">
-           <item row="2" column="2">
-            <widget class="QLabel" name="label_50">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="font">
-              <font>
-               <family>微软雅黑</family>
-               <pointsize>11</pointsize>
-               <weight>50</weight>
-               <bold>false</bold>
-              </font>
-             </property>
-             <property name="text">
-              <string>停止</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
            <item row="2" column="0">
             <widget class="QLabel" name="label_31">
              <property name="minimumSize">
@@ -1672,22 +1648,6 @@
            </item>
            <item row="2" column="1">
             <widget class="QMyLed" name="internalControlModelLed" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>25</width>
-               <height>25</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="3">
-            <widget class="QMyLed" name="stopLed" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>

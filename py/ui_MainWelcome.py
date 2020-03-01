@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'MainWelcome.ui'
+# Form implementation generated from reading ui file 'e:\project\flight-control-simulation\QtAppV1\MainWelcome.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWelcome(object):
     def setupUi(self, MainWelcome):
         MainWelcome.setObjectName("MainWelcome")
         MainWelcome.resize(1000, 700)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/icons/Img/Icon 6.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/icons/Img/a128.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWelcome.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWelcome)
         self.centralwidget.setMinimumSize(QtCore.QSize(1000, 666))
@@ -202,5 +204,4 @@ class Ui_MainWelcome(object):
         self.label_3.setText(_translate("MainWelcome", "<html><head/><body><p><span style=\" color:#ffffff;\">地面站</span></p></body></html>"))
         self.label_4.setText(_translate("MainWelcome", "<html><head/><body><p><span style=\" color:#ffffff;\">控制律</span></p></body></html>"))
         self.label_2.setText(_translate("MainWelcome", "<html><head/><body><p align=\"center\" style=\'line-height:70%\'><span style=\" color:#ffffff;\">南京航空航天大学</span></p><p align=\"center\" style=\'line-height:80%\'><span style=\" color:#ffffff; \">先进飞行控制研究课题组</span></p></body></html>"))
-
 import res_rc
