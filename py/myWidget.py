@@ -193,6 +193,7 @@ if __name__ == "__main__":  # 用于当前窗体测试
     freeze_support()
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     # 由于使用了多线程，使用pyinstaller打包的时候要加上这句
+    app = 0  # 清除上次运行的残留
     app = QApplication(sys.argv)  # 创建GUI应用程序
     form = QmyWidget()  # 创建窗体
     form.show()

@@ -457,6 +457,7 @@ class QmyMainWindow(QMainWindow):
 #     sys.exit(app.exec_())
 
 if __name__ == "__main__":
+    app = 0     # 清除上次运行的残留
     v_compare = QVersionNumber(5, 6, 0)
     v_current, _ = QVersionNumber.fromString(QT_VERSION_STR)  # 获取当前Qt版本
     if QVersionNumber.compare(v_current, v_compare) >= 0:
