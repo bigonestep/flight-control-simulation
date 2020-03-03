@@ -89,6 +89,8 @@ class QmyFigureCanvas(QWidget):
         self.fig.canvas.draw()
 
     def updateFig(self, y, y_min, y_max, x_min, x_max):
+        # print("self.y", len(y))
+        # print("self.T",len(self.t))
         self.lineFig.set_xdata(self.t)
         self.lineFig.set_ydata(y)
         self.ax1.set_xlim([x_min, x_max])  # X轴坐标范围
@@ -128,6 +130,12 @@ class QmyFigureCanvas(QWidget):
         x = array(x)
         y = array(y)
         z = array(z)
+        # minLen = min(len(x),len(y),
+        #              len(z))
+        # x = x[-minLen:]
+        # y = y[-minLen:]
+        # z = z[-minLen:]      # 原作用由于多线程会出现数据不对齐的情况，
+                               # 因此这里强制数据对齐，但后面找到了数据不出现对齐的原因
         self.threeFigLine.set_data_3d(x, y, z)
 
         self.ax3D.set_xlim([xmin, xmax])

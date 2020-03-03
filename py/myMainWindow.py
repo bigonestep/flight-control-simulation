@@ -112,8 +112,8 @@ class QmyMainWindow(QMainWindow):
         self.LedTimer.start()
         self.LedTimer.timeout.connect(self.upLedState)  # 刷新指示灯状态
         # =================打开绘图进程================================
-        self.FigThread = FigQThread(rest=0.1, obj_ui=self)
         self.qmut = QMutex()  # 线程锁
+        self.FigThread = FigQThread(rest=0.1, obj_ui=self)
         # self.FigThread.daemon=True     # 设置线程为守护线程，即主线程关闭，子线程也关闭
         # 这里不用设置守护进程，因为子进程手动关闭了
         self.FigThread.start()
@@ -145,9 +145,7 @@ class QmyMainWindow(QMainWindow):
         phi_min, phi_max = self.set_Axis(self.phi.queueList)
         psi_min, psi_max = self.set_Axis(self.psi.queueList)
 
-        print(self.H.len())
-
-        # print(len(self.H.queueList))
+        print(len(self.H.queueList))
         # self.time2 = self.time1
         # self.time1 = time.time()
         # print("%.4f" % (self.time1-self.time2))
@@ -356,25 +354,28 @@ class QmyMainWindow(QMainWindow):
         self.updateLedModelState()
         self.updataEngineState()
 
+    def updateTime(self):
+            self.ui.heightView.t = linspace(self.T, self.T + 10,  len(self.H.queueList))
+            self.ui.thetaView.t = linspace(self.T, self.T + 10, len(self.theta.queueList))
+            self.ui.phiView.t = linspace(self.T, self.T + 10, len(self.phi.queueList))
+            self.ui.psiView.t = linspace(self.T, self.T + 10, len(self.psi.queueList))
+            self.T += 0.1
+
     # 读取内存数据  更新绘图   更新状态灯   该函数为定时执行函数
     def readData_UpFigure_UpState(self):
         if self.ret == 0:
             self.para = self.get.readAll()
             # 小图获取数据
+            self.X.updata(self.para[data['X']])
+            self.Y.updata(self.para[data['Y']])
             self.H.updata(self.para[data['H']])
             self.theta.updata(self.para[data['theta']])
             self.phi.updata(self.para[data['phi']])
             self.psi.updata(self.para[data['psi']])
-            self.ui.heightView.t = linspace(self.T, self.T + 10,  len(self.H.queueList))
-            self.ui.thetaView.t = linspace(self.T, self.T + 10, len(self.theta.queueList))
-            self.ui.phiView.t = linspace(self.T, self.T + 10, len(self.phi.queueList))
-            self.ui.psiView.t = linspace(self.T, self.T + 10, len(self.psi.queueList))
-            self.drawFigure()
-            self.T += 0.1
+            self.updateTime()
             
+            self.drawFigure()
             # ===========3维数据更新====================
-            self.X.updata(self.para[data['X']])
-            self.Y.updata(self.para[data['Y']])
             self.drawThreeDFigure()
 
             # =============地图更新=====================
@@ -459,6 +460,7 @@ class QmyMainWindow(QMainWindow):
         tempList = [self.X, self.Y, self.H, self.psi, self.phi, self.theta]
         for i in tempList:
             getattr(i, "savaData")(n)    # 反射
+        self.updateTime()
 
 
 #  ============窗体测试程序 ================================

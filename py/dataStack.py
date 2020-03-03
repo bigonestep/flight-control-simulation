@@ -45,7 +45,7 @@ class queue(object):
         if self.len() > newListLen:
             del self.queueList
             self.queueList = [0]*newListLen
-            print("self.queueList.len()", len(self.queueList))
+            
             self.allNum = newListLen
             self.newNum = 0
 
@@ -54,8 +54,6 @@ class queue(object):
         # 功能： 截取原本队列的最后2个数值。为了画图时清空数据，和上面函数配合使用
         if self.len() > newListLen:
             self.queueList = self.queueList[-newListLen:]
-            print("self.queueList", self.queueList)
-            print("self.queueList.len()", len(self.queueList))
             self.newNum = 0
             self.allNum = 0
 
