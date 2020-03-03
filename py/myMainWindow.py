@@ -12,7 +12,7 @@ import time
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel, QMessageBox,
                              QInputDialog, QLineEdit)
 from PyQt5.QtCore import (pyqtSlot, pyqtSignal, QTimer, QMargins, QCoreApplication,
-                          Qt, QT_VERSION_STR, QVersionNumber)
+                          Qt, QT_VERSION_STR, QVersionNumber, QMutex)
 from PyQt5.QtGui import QFont
 from numpy import linspace 
 import matplotlib.image as img
@@ -62,12 +62,13 @@ class QmyMainWindow(QMainWindow):
         self.time1 = 0
         # 绘图数据初始化
         self.T = 0
-        dotNum = 2
+        dotNum = 1
         # 获取的数据存放在队列里面，初始化为30个点
-        self.H = queue(dotNum)
-        self.theta = queue(dotNum)
-        self.phi = queue(dotNum)
-        self.psi = queue(dotNum)
+        self.allSize = 2000
+        self.H = queue(dotNum, self.allSize)
+        self.theta = queue(dotNum, self.allSize)
+        self.phi = queue(dotNum, self.allSize)
+        self.psi = queue(dotNum, self.allSize)
         view = ("heightView", "thetaView", "phiView", "psiView")
         for i in view:
             getattr(self.ui, i).createFigure()
@@ -85,16 +86,18 @@ class QmyMainWindow(QMainWindow):
                                                     top=1, bottom=0.2)
 
         # =========================绘制 3维曲线初始化 ==========================
-        self.X = queue(dotNum)
-        self.Y = queue(dotNum)
+        self.X = queue(dotNum, self.allSize)
+        self.Y = queue(dotNum, self.allSize)
 
         self.ui.threeDView.createThreeDFigure()     # 初始化三维画布
         self.ui.threeDView.iniThreeDFigure()        # 对某些属性进行设置
         self.ui.threeDView.drawThreeFig(self.X.queueList, self.Y.queueList, self.H.queueList)
 
         # =========================绘制地图曲线初始化 ===========================
+        self.mapX = queue(dotNum, self.allSize)
+        self.mapY = queue(dotNum, self.allSize)
         self.ui.mapView.createMapFigure()
-        self.ui.mapView.drawMapFig(self.X.queueList, [-i for i in self.Y.queueList])
+        self.ui.mapView.drawMapFig(self.mapX.queueList, [-i for i in self.mapY.queueList])
     
         # ================指示灯模块初始化=====================
         self.ledFlightState = 0
@@ -110,6 +113,7 @@ class QmyMainWindow(QMainWindow):
         self.LedTimer.timeout.connect(self.upLedState)  # 刷新指示灯状态
         # =================打开绘图进程================================
         self.FigThread = FigQThread(rest=0.1, obj_ui=self)
+        self.qmut = QMutex()  # 线程锁
         # self.FigThread.daemon=True     # 设置线程为守护线程，即主线程关闭，子线程也关闭
         # 这里不用设置守护进程，因为子进程手动关闭了
         self.FigThread.start()
@@ -140,6 +144,9 @@ class QmyMainWindow(QMainWindow):
         theta_min, theta_max = self.set_Axis(self.theta.queueList)
         phi_min, phi_max = self.set_Axis(self.phi.queueList)
         psi_min, psi_max = self.set_Axis(self.psi.queueList)
+
+        print(self.H.len())
+
         # print(len(self.H.queueList))
         # self.time2 = self.time1
         # self.time1 = time.time()
@@ -176,11 +183,12 @@ class QmyMainWindow(QMainWindow):
 
     # ====================地图曲线========================
     def drawMapFigure(self):
-        xMin, xMax = self.ui.mapView.mapAxis(self.X.queueList)
-        tep = max(abs(self.ymin), abs(self.ymax))
+        ymin, ymax = self.set_Axis(self.mapY.queueList)
+        xMin, xMax = self.ui.mapView.mapAxis(self.mapX.queueList)
+        tep = max(abs(ymin), abs(ymax))
         yMin = -tep
         yMax = tep
-        self.ui.mapView.updataMapFig(self.X.queueList, [-i for i in self.Y.queueList],
+        self.ui.mapView.updataMapFig(self.mapX.queueList, [-i for i in self.mapY.queueList],
                                      xMin, xMax, yMin, yMax)
 
     # ==============event处理函数==========================
@@ -292,17 +300,20 @@ class QmyMainWindow(QMainWindow):
         newFlightStatus = int(self.get.readOrWriteData('acceptFlightStatus', 'r'))
         if self.ledFlightState != newFlightStatus:
             self.ledFlightState = newFlightStatus
-            # if newFlightStatus == ledFlight['stopLed']:
-            #     self.ledFlightStateMutex('stopLed')
-            #     self.stopState = True
-            if newFlightStatus == ledFlight['allLedOff']:
+            if newFlightStatus == ledFlight['stopLed']:
+                self.ledFlightStateMutex('stopLed')
+                self.stopState = True
+            elif newFlightStatus == ledFlight['allLedOff']:
                 self.ledFlightStateMutex('allLedOff')
             else:
                 newDict = {v: k for k, v in ledFlight.items()}
                 self.ledFlightStateMutex(newDict[newFlightStatus])
-                # if self.stopState:
-                #     self.stopState = False
-                #     self.reFig()
+                if self.stopState:
+                    print("stopState", self.stopState)
+                    self.stopState = False
+                    self.qmut.lock()
+                    self.reFig()
+                    self.qmut.unlock()
     # 更新发动机灯
     def ledEngineStateMutex(self, clickled):
         self.ledEngineFunction.ledEngine(clickled)
@@ -367,6 +378,8 @@ class QmyMainWindow(QMainWindow):
             self.drawThreeDFigure()
 
             # =============地图更新=====================
+            self.mapX.updata(self.para[data['X']])
+            self.mapY.updata(self.para[data['Y']])
             self.drawMapFigure()
             retu = 0
         else:
@@ -441,9 +454,11 @@ class QmyMainWindow(QMainWindow):
 
     # 使X、Y、H画图的数据截取到后二个
     def reFig(self):
-        self.X.savaData()
-        self.Y.savaData()
-        self.H.redata()
+        # queue
+        n = 2
+        tempList = [self.X, self.Y, self.H, self.psi, self.phi, self.theta]
+        for i in tempList:
+            getattr(i, "savaData")(n)    # 反射
 
 
 #  ============窗体测试程序 ================================

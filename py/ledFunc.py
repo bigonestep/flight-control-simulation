@@ -11,7 +11,7 @@ ledFlightTuple = (
     'takeOffLed', 'landingLed', 'climb1Led',
     'decline1Led', 'climb2Led', 'decline2Led',
     'turnLeftLed', 'turnRightLed', 'keepHeightLed',
-    'keepDirectLed',  # 'stopLed',
+    'keepDirectLed',  'stopLed',
     'keepPostureLed'
 )
 ledFlightInfo = (

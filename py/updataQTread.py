@@ -6,7 +6,7 @@
 * @function:   多线程
 """
 # -*- coding: utf-8 -*-
-import sys, os, time
+import time
 from PyQt5.QtCore import QThread, pyqtSignal
 from GetDataFromShareMem import getShareMemData  # .so为底层
 # from shareMem import getShareMemData              # py直接调用win的API作为底层

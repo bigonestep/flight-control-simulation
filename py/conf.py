@@ -15,7 +15,7 @@ ledFlight = {  # 正确
     'climb1Led': 3, 'decline1Led': 4, 'climb2Led': 5,
     'decline2Led': 6, 'turnLeftLed': 7, 'turnRightLed': 8,
     'keepHeightLed': 9, 'keepDirectLed': 10,  # 无11
-    # 'stopLed': 12, 
+    'stopLed': 12,
     'keepPostureLed': 13
 }
 #  发动机的指示灯

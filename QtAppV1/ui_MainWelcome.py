@@ -15,7 +15,7 @@ class Ui_MainWelcome(object):
         MainWelcome.setObjectName("MainWelcome")
         MainWelcome.resize(1000, 700)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/icons/Img/Icon 6.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/icons/Img/a128.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWelcome.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWelcome)
         self.centralwidget.setMinimumSize(QtCore.QSize(1000, 666))
