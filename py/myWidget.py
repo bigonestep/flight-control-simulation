@@ -105,7 +105,7 @@ class QmyWidget(QMainWindow):
             curPath = QDir.currentPath()
             dlgTitle = u"打开PyCharm软件"
             filt = u"执行程序(*.exe);;所有文件(*.*)"
-            filename, filtUsed = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
+            filename, _ = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
             if "pycharm" in filename.lower():
                 win32api.ShellExecute(0, 'open', filename, '', '', 1)
             elif filename == '':
@@ -128,7 +128,7 @@ class QmyWidget(QMainWindow):
             curPath = QDir.currentPath()
             dlgTitle = u"打开MatLab软件"
             filt = u"执行程序(*.exe);;所有文件(*.*)"
-            filename, filtUsed = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
+            filename, _ = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
             if "matlab" in filename.lower():
                 win32api.ShellExecute(0, 'open', filename, '', '', 1)
             elif filename == '':
@@ -149,7 +149,7 @@ class QmyWidget(QMainWindow):
             curPath = QDir.currentPath()
             dlgTitle = u"打开Rhapsody软件"
             filt = u"执行程序(*.exe);;所有文件(*.*)"
-            filename, filtUsed = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
+            filename, _ = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
             if "rhapsody" in filename.lower():
                 # os.system('"'+filename+'"')
                 win32api.ShellExecute(0, 'open', filename, "", '', 1)

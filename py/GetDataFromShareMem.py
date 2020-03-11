@@ -117,3 +117,4 @@ class getShareMemData(object):
 #         else:
 #             print("打开失败")
 #         get.closeShareMem()
+
