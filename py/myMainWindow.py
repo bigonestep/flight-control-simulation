@@ -26,7 +26,9 @@ from ledFunc import (ledFlightFunc, ledEngineFunc, ledModelFunc)
 from conf import (ledFlight, ledEngine, ledModel,
                   orderDict, orderInfo, edit, data,
                   updateTime)                  
-from updataQTread import FigQThread
+from updataQTread import FigQThread, MapQThread
+from map import baiduMap, getCity
+from configparser import ConfigParser
 
 
 class QmyMainWindow(QMainWindow): 
@@ -75,7 +77,6 @@ class QmyMainWindow(QMainWindow):
             getattr(self.ui, i).t = linspace(0, 10, dotNum)
             # linspace的含义为  0-10范围内均等取30个数
 
- 
         self.ui.heightView.drawFig(u"高度", "t(s)", self.H.queueList)
         self.ui.thetaView.drawFig(u"俯仰角", "t(s)", self.theta.queueList)
         self.ui.phiView.drawFig(u"滚转角", "t(s)", self.phi.queueList)
@@ -93,14 +94,14 @@ class QmyMainWindow(QMainWindow):
         self.ui.threeDView.createThreeDFigure()     # 初始化三维画布
         self.ui.threeDView.iniThreeDFigure()        # 对某些属性进行设置
         self.ui.threeDView.drawThreeFig(self.X.queueList, self.Y.queueList, self.H.queueList)
+        # =================打开绘图进程================================
+        self.qmut = QMutex()  # 线程锁
+        self.FigThread = FigQThread(rest=0.1, obj_ui=self)
+        # self.FigThread.daemon=True     # 设置线程为守护线程，即主线程关闭，子线程也关闭
+        # 这里不用设置守护进程，因为子进程手动关闭了
+        self.FigThread.start()
 
-        # =========================绘制地图曲线初始化 ===========================
-        # TODO: 地图初始化
-        # self.mapX = queue(dotNum, self.allSize)
-        # self.mapY = queue(dotNum, self.allSize)
-        # self.ui.mapView.createMapFigure()
-        # self.ui.mapView.drawMapFig(self.mapX.queueList, [-i for i in self.mapY.queueList])
-    
+        # #################################################################
         # ================指示灯模块初始化=====================
         self.ledFlightState = 0
         self.ledModelState = 0        # 程控灯的状态为灭的
@@ -113,13 +114,45 @@ class QmyMainWindow(QMainWindow):
         self.LedTimer.setInterval(updateTime)   # 100ms
         self.LedTimer.start()
         self.LedTimer.timeout.connect(self.upLedState)  # 刷新指示灯状态
-        # =================打开绘图进程================================
-        self.qmut = QMutex()  # 线程锁
-        self.FigThread = FigQThread(rest=0.1, obj_ui=self)
-        # self.FigThread.daemon=True     # 设置线程为守护线程，即主线程关闭，子线程也关闭
-        # 这里不用设置守护进程，因为子进程手动关闭了
-        self.FigThread.start()
 
+        # ####################################################################
+        # =========================绘制地图曲线初始化 ===========================
+        # TODO: 地图初始化
+        config = ConfigParser()
+        config.read("projectPath.ini", encoding='utf-8')
+        city = getCity()
+        self.cityInfo = city.getLocal()
+        # print("point:", self.para[data['X']], self.para[data['Y']])
+        gps_x = self.para[data['X']] * 0.00000899    # 经度转换米转换成gps坐标，误差很大   夸大了10倍
+        gps_y = self.para[data['Y']] * 0.00001141     # 以北纬38度为基准
+        self.map = baiduMap(self.ui.mapView, float(config['mapconfig']["default_gps_x"])+gps_x,
+                           float(config['mapconfig']["default_gps_y"])+gps_y)
+        print("this")
+        # if self.cityInfo[0] != None and self.cityInfo[1] != None:
+        #     # with open(r"./map.html", "r", encoding="utf-8") as f:
+        #     #     new = []
+        #     #     for line in f:
+        #     #         new.append(line)
+        #     #
+        #     # with open(r"./map.html", "w", encoding="utf-8") as f:
+        #     #     for n in new:
+        #     #         if "var" in n and "pointX" in n:
+        #     #             f.write("var pointX = {0}\n".format(float(self.cityInfo[0]) + gps_x))
+        #     #         elif "var" in n and "pointY" in n:
+        #     #             f.write("var pointY = {0}\n".format(float(self.cityInfo[1]) + gps_x))
+        #     #         else:
+        #     #             f.write(n)
+        #
+        #     self.map = baiduMap(self.ui.mapView)
+        #
+        # else:
+        # config = ConfigParser()
+        # config.read("projectPath.ini", encoding='utf-8')
+
+        # 前两个是起始点，后两个为系统打开无人机的坐标
+        # 地图的线程
+        self.mapThread = MapQThread(rest=1, obj_ui=self)
+        self.mapThread.start()
         # ================记录飞行时间================
         self.beginRunTime = None 
 
@@ -172,7 +205,7 @@ class QmyMainWindow(QMainWindow):
         min_axis = min(set_list)
         if max_axis - min_axis < 20:
             max_axis = max_axis + 1
-            min_axis = min_axis -0.5
+            min_axis = min_axis - 0.5
         else:
             min_axis -= 5
             max_axis += 5
@@ -187,17 +220,6 @@ class QmyMainWindow(QMainWindow):
                                           self.xmin, self.xmax, self.ymin, self.ymax,
                                           self.H_min, self.H_max)
 
-    # ====================地图曲线========================
-    # TODO:地图曲线绘制
-    # def drawMapFigure(self):
-    #     ymin, ymax = self.set_Axis(self.mapY.queueList)
-    #     xMin, xMax = self.ui.mapView.mapAxis(self.mapX.queueList)
-    #     tep = max(abs(ymin), abs(ymax))
-    #     yMin = -tep
-    #     yMax = tep
-    #     self.ui.mapView.updataMapFig(self.mapX.queueList, [-i for i in self.mapY.queueList],
-    #                                  xMin, xMax, yMin, yMax)
-
     # ==============event处理函数==========================
     # 窗口关闭的事件重写
     def closeEvent(self, event):
@@ -209,7 +231,8 @@ class QmyMainWindow(QMainWindow):
         if result == QMessageBox.Yes:
             if self.key:
                 self.FigThread.closeThread = True
-                time.sleep(0.3)
+                self.mapThread.closeThread = True
+                time.sleep(0.6)
                 # 等待进入线程中关闭线程
                 self.get.closeShareMem()
                 print("关闭共享内存成功")
@@ -370,6 +393,11 @@ class QmyMainWindow(QMainWindow):
             self.ui.psiView.t = linspace(self.T, self.T + 10, len(self.psi.queueList))
             self.T += 0.1
 
+    def updataMap(self):
+        # =============地图更新=====================
+        # TODO： 地图更新
+        self.map.autoShow(self.para[data['X']], self.para[data['Y']])
+
     # 读取内存数据  更新绘图   更新状态灯   该函数为定时执行函数
     def readData_UpFigure_UpState(self):
         if self.ret == 0:
@@ -387,11 +415,7 @@ class QmyMainWindow(QMainWindow):
             # ===========3维数据更新====================
             self.drawThreeDFigure()
 
-            # =============地图更新=====================
-            # TODO： 地图更新
-            # self.mapX.updata(self.para[data['X']])
-            # self.mapY.updata(self.para[data['Y']])
-            # self.drawMapFigure()
+
             retu = 0
         else:
             retu = -1
@@ -428,15 +452,6 @@ class QmyMainWindow(QMainWindow):
             return key.encode("utf-8")
         else: 
             sys.exit(0)
-            # dlgTitle = u"警告"
-            # strInfo = u"默认使用 \"szName\" 为密匙"
-            # defaultBtn = QMessageBox.No
-            # result = QMessageBox.information(self, dlgTitle, strInfo,
-            #                                  QMessageBox.Yes | QMessageBox.No, defaultBtn)
-            # if result == QMessageBox.Yes:
-            #     return "szName".encode("utf-8")
-            # else:
-            #     return None                              
 
     # 打开内存，在最前面执行
     def openMemory(self):
@@ -492,4 +507,3 @@ if __name__ == "__main__":
     myMainWin.show()
     sys.exit(app.exec())
 
-    

@@ -6,21 +6,13 @@
 * @Last Modified time: 2020-02-26 02:07:40  
 * @function: 主界面
 """
-import sys,os
 
-#import subprocess
-from PyQt5.QtWidgets import  QApplication, QWidget,QMessageBox,QMainWindow,QFileDialog
-#from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QPainter,QPixmap, QCloseEvent
-from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QDir, QCoreApplication, QT_VERSION_STR
+import sys, os
+from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox, QMainWindow, QFileDialog
+from PyQt5.QtGui import QPainter, QPixmap
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt, QDir, QCoreApplication, QT_VERSION_STR
 import win32api
-from multiprocessing import Process,freeze_support
-
-
-##from PyQt5.QtWidgets import  
-
-from PyQt5.QtGui import QIcon
-
+from multiprocessing import Process, freeze_support
 
 from myMainWindow import QmyMainWindow
 from ui_MainWelcome import Ui_MainWelcome
@@ -53,12 +45,6 @@ class QmyWidget(QMainWindow):
     def ini(self):
         config = ConfigParser()
         config.read("projectPath.ini", encoding='utf-8')
-        # self.pycharmPath = r"D:\Program Files\JetBrains\PyCharm 2019.2.3\bin\pycharm64.exe"
-        # self.pyProjectPath = r"E:\project\py\py (4)"
-        # self.RhapsodyPath = r"C:\Program Files\IBM\Rational\Rhapsody\8.0.6\rhapsody.exe"
-        # self.RhapsodyProjectPath = r"E:\ZWYMav\CosimMAV\CosimMAV.rpy"
-        # self.matlabPath = r"D:\MATLAB\R2016b\bin\win64\MATLAB.exe"
-        # self.matlabProjectPath = r""
         paths = ["pycharmPath", "pyProjectPath", "RhapsodyPath", "RhapsodyProjectPath",
                 "matlabPath", "matlabProjectPath", "RhapsodyProjectExePath"]
         name = ["pycharm软件路径","pycharm项目的路径","Rhapsody软件路径",
@@ -74,10 +60,6 @@ class QmyWidget(QMainWindow):
                 strInfo = dictPath[path] + "设置错误, 请在projectPath.ini文件中设置"
                 QMessageBox.critical(self, dlgTitle, strInfo)
                 sys.exit(0)
-    
-                  
-
-
 
     #  ==============自定义功能函数========================
 
