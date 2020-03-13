@@ -74,13 +74,14 @@ class QmyMainWindow(QMainWindow):
             getattr(self.ui, i).createFigure()
             getattr(self.ui, i).t = linspace(0, 10, dotNum)
             # linspace的含义为  0-10范围内均等取30个数
-        # 设置小图边距
-        # 设置边距   范围为（0-1）其中右上越大越靠边，左下越小越靠边
+
  
         self.ui.heightView.drawFig(u"高度", "t(s)", self.H.queueList)
         self.ui.thetaView.drawFig(u"俯仰角", "t(s)", self.theta.queueList)
         self.ui.phiView.drawFig(u"滚转角", "t(s)", self.phi.queueList)
         self.ui.psiView.drawFig(u"偏航角", "t(s)", self.psi.queueList)
+        # 设置小图边距
+        # 设置边距   范围为（0-1）其中右上越大越靠边，左下越小越靠边
         for i in view:
             getattr(self.ui, i).fig.subplots_adjust(right=1, left=0.17, 
                                                     top=1, bottom=0.2)
@@ -94,10 +95,11 @@ class QmyMainWindow(QMainWindow):
         self.ui.threeDView.drawThreeFig(self.X.queueList, self.Y.queueList, self.H.queueList)
 
         # =========================绘制地图曲线初始化 ===========================
-        self.mapX = queue(dotNum, self.allSize)
-        self.mapY = queue(dotNum, self.allSize)
-        self.ui.mapView.createMapFigure()
-        self.ui.mapView.drawMapFig(self.mapX.queueList, [-i for i in self.mapY.queueList])
+        # TODO: 地图初始化
+        # self.mapX = queue(dotNum, self.allSize)
+        # self.mapY = queue(dotNum, self.allSize)
+        # self.ui.mapView.createMapFigure()
+        # self.ui.mapView.drawMapFig(self.mapX.queueList, [-i for i in self.mapY.queueList])
     
         # ================指示灯模块初始化=====================
         self.ledFlightState = 0
@@ -123,18 +125,24 @@ class QmyMainWindow(QMainWindow):
 
     # ===================状态栏============================
     def __buildUI(self):
+        font_size = QFont()
+        font_size.setPointSize(15)
         self.LabAircraftInfo = QLabel(self)
+        self.LabAircraftInfo.setFont(font_size)
         self.LabAircraftInfo.setMinimumWidth(300)
         self.LabAircraftInfo.setText(u"当前飞机状态：")
         self.ui.statusbar.addWidget(self.LabAircraftInfo)
         
         self.__LabInfo = QLabel(self)
+        self.__LabInfo.setFont(font_size)
         self.__LabInfo.setMinimumWidth(300)
         self.__LabInfo.setText(u"指令发送：")
         self.ui.statusbar.addWidget(self.__LabInfo)
 
         # 最右侧1050
         self.LabRightInfo = QLabel(self)
+        self.LabRightInfo.setFont(font_size)
+
         self.LabRightInfo.setText(u"")
         self.ui.statusbar.addPermanentWidget(self.LabRightInfo)
 
@@ -180,14 +188,15 @@ class QmyMainWindow(QMainWindow):
                                           self.H_min, self.H_max)
 
     # ====================地图曲线========================
-    def drawMapFigure(self):
-        ymin, ymax = self.set_Axis(self.mapY.queueList)
-        xMin, xMax = self.ui.mapView.mapAxis(self.mapX.queueList)
-        tep = max(abs(ymin), abs(ymax))
-        yMin = -tep
-        yMax = tep
-        self.ui.mapView.updataMapFig(self.mapX.queueList, [-i for i in self.mapY.queueList],
-                                     xMin, xMax, yMin, yMax)
+    # TODO:地图曲线绘制
+    # def drawMapFigure(self):
+    #     ymin, ymax = self.set_Axis(self.mapY.queueList)
+    #     xMin, xMax = self.ui.mapView.mapAxis(self.mapX.queueList)
+    #     tep = max(abs(ymin), abs(ymax))
+    #     yMin = -tep
+    #     yMax = tep
+    #     self.ui.mapView.updataMapFig(self.mapX.queueList, [-i for i in self.mapY.queueList],
+    #                                  xMin, xMax, yMin, yMax)
 
     # ==============event处理函数==========================
     # 窗口关闭的事件重写
@@ -379,9 +388,10 @@ class QmyMainWindow(QMainWindow):
             self.drawThreeDFigure()
 
             # =============地图更新=====================
-            self.mapX.updata(self.para[data['X']])
-            self.mapY.updata(self.para[data['Y']])
-            self.drawMapFigure()
+            # TODO： 地图更新
+            # self.mapX.updata(self.para[data['X']])
+            # self.mapY.updata(self.para[data['Y']])
+            # self.drawMapFigure()
             retu = 0
         else:
             retu = -1
@@ -406,7 +416,7 @@ class QmyMainWindow(QMainWindow):
     # =================打开内存相关================
     def keyInputWindow(self):
         f = QFont()
-        f.setPointSize(20)
+        f.setPointSize(50)
         dlgTitle = u"请输入联合系统密匙"
         txtLable = u"请仔细检查填写的密匙, 如未能取得正确数据,\n请关闭系统，然后重新填写密匙。"
         defautInput = u"szName"
@@ -417,15 +427,16 @@ class QmyMainWindow(QMainWindow):
             print("key:", key)
             return key.encode("utf-8")
         else: 
-            dlgTitle = u"警告"
-            strInfo = u"默认使用 \"szName\" 为密匙"
-            defaultBtn = QMessageBox.No
-            result = QMessageBox.information(self, dlgTitle, strInfo,
-                                             QMessageBox.Yes | QMessageBox.No, defaultBtn)
-            if result == QMessageBox.Yes:
-                return "szName".encode("utf-8")
-            else:
-                return None                              
+            sys.exit(0)
+            # dlgTitle = u"警告"
+            # strInfo = u"默认使用 \"szName\" 为密匙"
+            # defaultBtn = QMessageBox.No
+            # result = QMessageBox.information(self, dlgTitle, strInfo,
+            #                                  QMessageBox.Yes | QMessageBox.No, defaultBtn)
+            # if result == QMessageBox.Yes:
+            #     return "szName".encode("utf-8")
+            # else:
+            #     return None                              
 
     # 打开内存，在最前面执行
     def openMemory(self):
@@ -464,15 +475,6 @@ class QmyMainWindow(QMainWindow):
 
 
 #  ============窗体测试程序 ================================
-
-# if  __name__ == "__main__":        #用于当前窗体测试
-#     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
-#     app = QApplication(sys.argv)    #创建GUI应用程序
-    
-#     form=QmyMainWindow()            #创建窗体
-#     form.show()
-#     sys.exit(app.exec_())
-
 if __name__ == "__main__":
     app = 0     # 清除上次运行的残留
     v_compare = QVersionNumber(5, 6, 0)
@@ -489,3 +491,5 @@ if __name__ == "__main__":
     myMainWin = QmyMainWindow()
     myMainWin.show()
     sys.exit(app.exec())
+
+    

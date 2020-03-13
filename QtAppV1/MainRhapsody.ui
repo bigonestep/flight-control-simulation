@@ -2305,7 +2305,7 @@
           <widget class="QmyFigureCanvas" name="threeDView" native="true"/>
          </item>
          <item>
-          <widget class="QmyFigureCanvas" name="mapView" native="true"/>
+          <widget class="QWidget" name="mapView" native="true"/>
          </item>
         </layout>
        </widget>

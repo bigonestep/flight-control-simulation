@@ -11,7 +11,7 @@ import sys,os
 #import subprocess
 from PyQt5.QtWidgets import  QApplication, QWidget,QMessageBox,QMainWindow,QFileDialog
 #from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QPainter,QPixmap
+from PyQt5.QtGui import QPainter,QPixmap, QCloseEvent
 from PyQt5.QtCore import  pyqtSlot,pyqtSignal,Qt,QDir, QCoreApplication, QT_VERSION_STR
 import win32api
 from multiprocessing import Process,freeze_support
@@ -24,6 +24,7 @@ from PyQt5.QtGui import QIcon
 
 from myMainWindow import QmyMainWindow
 from ui_MainWelcome import Ui_MainWelcome
+from configparser import ConfigParser
 
 
 class QmyWidget(QMainWindow):
@@ -46,15 +47,37 @@ class QmyWidget(QMainWindow):
         self.RhapsodyProjectPath = None
         self.matlabPath = None
         self.matlabProjectPath = None
+        self.rhapsody_project = False    # 默认rhapsody工程打开标志
         self.ini()
 
     def ini(self):
-        self.pycharmPath = r"D:\Program Files\JetBrains\PyCharm 2019.2.3\bin\pycharm64.exe"
-        self.pyProjectPath = r"E:\project\py\py (4)"
-        self.RhapsodyPath = r"C:\Program Files\IBM\Rational\Rhapsody\8.0.6\rhapsody.exe"
-        self.RhapsodyProjectPath = r"E:\ZWYMav\CosimMAV\CosimMAV.rpy"
-        self.matlabPath = r"D:\MATLAB\R2016b\bin\win64\MATLAB.exe"
-        self.matlabProjectPath = r""
+        config = ConfigParser()
+        config.read("projectPath.ini", encoding='utf-8')
+        # self.pycharmPath = r"D:\Program Files\JetBrains\PyCharm 2019.2.3\bin\pycharm64.exe"
+        # self.pyProjectPath = r"E:\project\py\py (4)"
+        # self.RhapsodyPath = r"C:\Program Files\IBM\Rational\Rhapsody\8.0.6\rhapsody.exe"
+        # self.RhapsodyProjectPath = r"E:\ZWYMav\CosimMAV\CosimMAV.rpy"
+        # self.matlabPath = r"D:\MATLAB\R2016b\bin\win64\MATLAB.exe"
+        # self.matlabProjectPath = r""
+        paths = ["pycharmPath", "pyProjectPath", "RhapsodyPath", "RhapsodyProjectPath",
+                "matlabPath", "matlabProjectPath", "RhapsodyProjectExePath"]
+        name = ["pycharm软件路径","pycharm项目的路径","Rhapsody软件路径",
+                "Rhapsody项目的路径", "matlab软件路径", "sumlink文件的路径",
+                "Rhapsody项目编译之后的可执行文件路径"]
+        dictPath = dict(zip(paths, name))
+        for path in paths:
+            if path in config['DEFAULT']:
+                setattr(self, path, config['DEFAULT'][path]) 
+                # 利用反射给属性赋值
+            else:
+                dlgTitle = u"错误"
+                strInfo = dictPath[path] + "设置错误, 请在projectPath.ini文件中设置"
+                QMessageBox.critical(self, dlgTitle, strInfo)
+                sys.exit(0)
+    
+                  
+
+
 
     #  ==============自定义功能函数========================
 
@@ -79,6 +102,7 @@ class QmyWidget(QMainWindow):
 
         if result == QMessageBox.Yes:
             event.accept()
+            
         else:
             event.ignore()
 
@@ -140,7 +164,6 @@ class QmyWidget(QMainWindow):
 
     @pyqtSlot()
     def on_RhapsodyButton_clicked(self):
-        # print("Rh")
         if os.path.isfile(self.RhapsodyPath) and os.path.isfile(self.RhapsodyProjectPath):
             if "rhapsody" in self.RhapsodyPath.lower() and '.rpy' in self.RhapsodyProjectPath:
                 win32api.ShellExecute(0, 'open', self.RhapsodyPath, self.RhapsodyProjectPath, '', 1)
@@ -163,13 +186,28 @@ class QmyWidget(QMainWindow):
     @pyqtSlot()
     def on_mainSystemButton_clicked(self):
         # 打开控制界面的槽函数
-        # win32api.ShellExecute(0, 'open',r"myMainWindow.exe", '', '', 1)
-        # form=QmyMainWindow(self)            #创建窗体
-        # form.setAttribute(Qt.WA_DeleteOnClose)
-        # form.show()
+        if os.path.isfile(self.RhapsodyProjectExePath):
+            if  '.exe' in self.RhapsodyProjectExePath:
+                win32api.ShellExecute(0, 'open', self.RhapsodyProjectExePath, "", '', 1)
+                # print("打开rhapsody成功！！！")
+        else:
+            curPath = QDir.currentPath()
+            dlgTitle = u"打开Rhapsody项目编译之后可执行文件"
+            filt = u"执行程序(*.exe);;所有文件(*.*)"
+            filename, _ = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
+            if ".exe" in filename.lower():
+                # os.system('"'+filename+'"')
+                win32api.ShellExecute(0, 'open', filename, "", '', 1)
+                # 项目打开成功了，然后打开主面板
+                mainWindow = MainWindow()
+                mainWindow.start()
+            elif filename == '':
+                pass
+            else:
+                dlgTitle = u"打开错误"
+                strInfo = u"打开Rhapsody项目编译之后可执行文件"
+                QMessageBox.critical(self, dlgTitle, strInfo)
 
-        mainWindow = MainWindow()
-        mainWindow.start()
 
 
 class MainWindow(Process):
@@ -179,6 +217,7 @@ class MainWindow(Process):
     def run(self):
         #       #while True:
         #          # win32api.ShellExecute(0, 'open',r"myMainWindow.exe", '', '', 1)
+        #   启动Rhapsody的.exe
         QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
         mainapp = QApplication(sys.argv)  # 创建GUI应用程序
         mainform = QmyMainWindow()  # 创建窗体

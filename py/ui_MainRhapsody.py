@@ -1138,7 +1138,7 @@ class Ui_MainRhapsody(object):
         self.threeDView = QmyFigureCanvas(self.b1)
         self.threeDView.setObjectName("threeDView")
         self.verticalLayout_3.addWidget(self.threeDView)
-        self.mapView = QmyFigureCanvas(self.b1)
+        self.mapView = QtWidgets.QWidget(self.b1)
         self.mapView.setObjectName("mapView")
         self.verticalLayout_3.addWidget(self.mapView)
         self.verticalLayout_3.setStretch(0, 2)
