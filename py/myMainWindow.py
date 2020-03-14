@@ -6,7 +6,7 @@
 * @Last Modified time: 2020-02-26 02:08:04  
 * @function:  联合仿真界面
 """
-
+from os import system
 import sys
 import time
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel, QMessageBox,
@@ -117,37 +117,26 @@ class QmyMainWindow(QMainWindow):
 
         # ####################################################################
         # =========================绘制地图曲线初始化 ===========================
+        self.is_web = self.check_network()
+        print(self.is_web)
+
         # TODO: 地图初始化
         config = ConfigParser()
         config.read("projectPath.ini", encoding='utf-8')
         city = getCity()
         self.cityInfo = city.getLocal()
-        # print("point:", self.para[data['X']], self.para[data['Y']])
         gps_x = self.para[data['X']] * 0.00000899    # 经度转换米转换成gps坐标，误差很大   夸大了10倍
         gps_y = self.para[data['Y']] * 0.00001141     # 以北纬38度为基准
-        self.map = baiduMap(self.ui.mapView, float(config['mapconfig']["default_gps_x"])+gps_x,
-                           float(config['mapconfig']["default_gps_y"])+gps_y)
-        print("this")
-        # if self.cityInfo[0] != None and self.cityInfo[1] != None:
-        #     # with open(r"./map.html", "r", encoding="utf-8") as f:
-        #     #     new = []
-        #     #     for line in f:
-        #     #         new.append(line)
-        #     #
-        #     # with open(r"./map.html", "w", encoding="utf-8") as f:
-        #     #     for n in new:
-        #     #         if "var" in n and "pointX" in n:
-        #     #             f.write("var pointX = {0}\n".format(float(self.cityInfo[0]) + gps_x))
-        #     #         elif "var" in n and "pointY" in n:
-        #     #             f.write("var pointY = {0}\n".format(float(self.cityInfo[1]) + gps_x))
-        #     #         else:
-        #     #             f.write(n)
-        #
-        #     self.map = baiduMap(self.ui.mapView)
-        #
-        # else:
-        # config = ConfigParser()
-        # config.read("projectPath.ini", encoding='utf-8')
+        if self.cityInfo[0] != None and self.cityInfo[1] != None:
+            self.map = baiduMap(self.ui.mapView,
+                                "{0}".format(float(self.cityInfo[0]) + gps_x),
+                                "{0}".format(float(self.cityInfo[1]) + gps_y)
+                                )
+        else:
+            self.map = baiduMap(self.ui.mapView,
+                                "{0}".format(float(config['mapconfig']["default_gps_x"])+gps_x),
+                                "{0}".format(float(config['mapconfig']["default_gps_y"])+gps_y)
+                                )
 
         # 前两个是起始点，后两个为系统打开无人机的坐标
         # 地图的线程
@@ -155,6 +144,19 @@ class QmyMainWindow(QMainWindow):
         self.mapThread.start()
         # ================记录飞行时间================
         self.beginRunTime = None 
+
+    # 检查网络
+    def check_network(self):
+        # TODO: 检查网络是否可用
+        exit_code = system('ping www.baidu.com')
+        if exit_code:
+            dlgTitle = u"警告"
+            strInfo = u"无网络,地图服务不可用！！！"
+            QMessageBox.information(self, dlgTitle, strInfo)
+            web = False
+        else:
+            web = True
+        return web
 
     # ===================状态栏============================
     def __buildUI(self):
