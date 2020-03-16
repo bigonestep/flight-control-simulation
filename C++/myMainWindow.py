@@ -22,14 +22,14 @@ ledFlight = {     # 正确
             'stopLed': 11,'keepPostureLed': 13
          }
 #  发动机的指示灯
-ledEngine = {   # TODO: 发动机状态没有预停，但是指示灯有预停
+ledEngine = {   # 发动机状态没有预停，但是指示灯有预停
             'allLedOff':0,
             'bigCartLed' : 1 ,'ratedLed':2, 'cruiseLed':3, 
             'slowTrainLed':4, 'idlingLed':5,'preStopLed': 6, 'parkingLed':7
 
          }   
 # 模式指示灯
-ledModel = {    # TODO: 和指令顺序不一样
+ledModel = {    # 和指令顺序不一样
             'allLedOff': 0,
             'programeControlModelLed':1,"remoteControlModelLed":2, "internalControlModelLed":3
             } 
@@ -350,7 +350,7 @@ class QmyMainWindow(QMainWindow):
 
 
    # 读取内存数据  更新绘图   更新状态灯   该函数为定时执行函数
-   def readData_UpFigure_UpState(self):     # TODO: 用多线程分解以一下
+   def readData_UpFigure_UpState(self):     # 多线程分解
       if self.ret == 0:
          self.para = self.get.readAll()
          # 小图获取数据
@@ -395,7 +395,7 @@ class QmyMainWindow(QMainWindow):
          if  self.LedProgrameControlState != newProgrameControlState:
             self.LedProgrameControlState = newProgrameControlState
             if newProgrameControlState == 1:
-               print("程控灯打开")       # TODO: 这地方要改成模式集体控制
+               print("程控灯打开")       # 这地方要改成模式集体控制
                self.ui.programeControlModelLed.state = 'on'
                self.ui.programeControlModelLed.repaint()
             else:
@@ -426,7 +426,7 @@ class QmyMainWindow(QMainWindow):
    def setProgrameControlOrder(self):
       if self.ret == 0:
          if int(self.get.readOrWriteData('acceptModel','r')) != 1:
-            retu = self.get.readOrWriteData('send','w',orderDict['programeControl'])    # TODO: 要敲定程控是哪个命令
+            retu = self.get.readOrWriteData('send','w',orderDict['programeControl'])   
             if retu == 0:  
                self.judgeFlightState(orderDict['programeControl'])  
          else:

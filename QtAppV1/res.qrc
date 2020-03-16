@@ -11,5 +11,6 @@
         <file>Img/loc1.png</file>
         <file>Img/loc.png</file>
         <file>Img/a128.ico</file>
+        <file>Img/settings_128px.ico</file>
     </qresource>
 </RCC>
