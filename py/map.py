@@ -5,14 +5,20 @@
 * @Last Modified time: 2020-03-16 16:19:13  
 * @function: 
 """
-import sys, os, requests
-from PyQt5 import QtWidgets, QtCore, QtGui
+
+
+from requests import get, exceptions
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
 from configparser import ConfigParser
 
-# TODO: 简化导入
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
+from PyQt5.QtWidgets import QVBoxLayout
+
+# from PyQt5.QtGui import *
+
+from PyQt5.QtCore import QUrl
+
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 
@@ -60,6 +66,10 @@ class baiduMap(object):
         // var pointX = 114.34144592;
         // var pointY = 34.79705048;
 
+        function init(){
+            pointX = pointX
+            pointY = pointY
+        }
         // ###################################################################
         //创建标注点并添加到地图中
         function addMarker(points) {
@@ -161,13 +171,11 @@ class baiduMap(object):
         self.browser.page().runJavaScript(jsFunction)
 
     def autoShow(self, x, y):
-        # TODO: 错误
         x = x * 0.00000899   # 经度转换米转换成gps坐标，误差很大
         y = y * 0.00001141   # 以北纬38度为基准
-        print("x, y", x, y)
         jsFunction = "dynamicLine({0}, {1});".format(x, y)
         self.browser.page().runJavaScript(jsFunction)
-        print(jsFunction)
+        
 
 
 class getCity(object):
@@ -184,16 +192,67 @@ class getCity(object):
                        r"key={0}".format(config['mapconfig']["city_key"])
 
     def getLocal(self):
-        # TODO:处理一下错误信息
         try:
-            self.log = requests.get(self.url_now).json()
+            self.log = get(self.url_now).json()
             now_APIcity = self.log['HeWeather6'][0]['basic']
             lat = now_APIcity['lat']
             lon = now_APIcity['lon']
-        except (KeyError, requests.exceptions.ConnectionError):
+        except (KeyError, exceptions.ConnectionError):
             lat = None
             lon = None
         return lon, lat
+
+
+
+
+
+class baiduNotWeb(object):
+    def __init__(self, mapView):
+        self.browser = None
+        self.mapView = mapView
+        self.baiduBrowser()
+        
+
+    def baiduBrowser(self):
+        self.browser = QWebEngineView(self.mapView)
+        vv = QVBoxLayout()
+        vv.setContentsMargins(0, 0, 0, 0)
+        # 设置四周边界
+        vv.addWidget(self.browser)
+        self.mapView.setLayout(vv)
+        # 指定打开界面的 URL
+        url = r"file:///./404.html"
+        self.browser.setUrl(QUrl(url))
+
+
+
+class getCity(object):
+    def __init__(self):
+        self.MY_WEATHER_KEY = None
+        self.url_now = None
+        self.getUrl()
+
+    def getUrl(self):
+        config = ConfigParser()
+        config.read("projectPath.ini", encoding='utf-8')
+
+        self.url_now = r"https://free-api.heweather.net/s6/weather/now?location=auto_ip&" \
+                       r"key={0}".format(config['mapconfig']["city_key"])
+
+    def getLocal(self):
+        try:
+            self.log = get(self.url_now).json()
+            now_APIcity = self.log['HeWeather6'][0]['basic']
+            lat = now_APIcity['lat']
+            lon = now_APIcity['lon']
+        except (KeyError, exceptions.ConnectionError):
+            lat = None
+            lon = None
+        return lon, lat
+
+
+
+
 
 
 if __name__ == '__main__':

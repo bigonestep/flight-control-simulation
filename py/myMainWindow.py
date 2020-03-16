@@ -27,8 +27,9 @@ from conf import (ledFlight, ledEngine, ledModel,
                   orderDict, orderInfo, edit, data,
                   updateTime)                  
 from updataQTread import FigQThread, MapQThread
-from map import baiduMap, getCity
+from map import baiduMap, getCity, baiduNotWeb 
 from configparser import ConfigParser
+from mySetParameters import QsetParameters
 
 
 class QmyMainWindow(QMainWindow): 
@@ -44,6 +45,7 @@ class QmyMainWindow(QMainWindow):
         # 记录上一个状态是否为stop状态
         self.stopState = False
         # ==================添加状态栏========================
+        # self.ui.setParametersButton.clicked.connect(self.on_setParametersButton_clicked)
         self.__buildUI()
         # ==================按钮功能类初始化==================
         # self.buttonFunction = buttonFunc(self)  # 改用静态方法
@@ -117,47 +119,57 @@ class QmyMainWindow(QMainWindow):
 
         # ####################################################################
         # =========================绘制地图曲线初始化 ===========================
-        self.is_web = self.check_network()
-        print(self.is_web)
-
-        # TODO: 地图初始化
-        config = ConfigParser()
-        config.read("projectPath.ini", encoding='utf-8')
-        city = getCity()
-        self.cityInfo = city.getLocal()
-        gps_x = self.para[data['X']] * 0.00000899    # 经度转换米转换成gps坐标，误差很大   夸大了10倍
-        gps_y = self.para[data['Y']] * 0.00001141     # 以北纬38度为基准
-        if self.cityInfo[0] != None and self.cityInfo[1] != None:
-            self.map = baiduMap(self.ui.mapView,
-                                "{0}".format(float(self.cityInfo[0]) + gps_x),
-                                "{0}".format(float(self.cityInfo[1]) + gps_y)
-                                )
-        else:
-            self.map = baiduMap(self.ui.mapView,
-                                "{0}".format(float(config['mapconfig']["default_gps_x"])+gps_x),
-                                "{0}".format(float(config['mapconfig']["default_gps_y"])+gps_y)
-                                )
-
-        # 前两个是起始点，后两个为系统打开无人机的坐标
-        # 地图的线程
-        self.mapThread = MapQThread(rest=1, obj_ui=self)
-        self.mapThread.start()
+        # 判断是否有网
+        self.is_web = False
+        self.check_network()    # 如果有网那么为True
+        self.webTimer = None
+        # 地图初始化
+        self.__buildMap()
+        
         # ================记录飞行时间================
         self.beginRunTime = None 
 
     # 检查网络
     def check_network(self):
-        # TODO: 检查网络是否可用
+        # 检查网络是否可用
         exit_code = system('ping www.baidu.com')
         if exit_code:
-            dlgTitle = u"警告"
+            dlgTitle = u"警告"                # 弹出警告窗
             strInfo = u"无网络,地图服务不可用！！！"
             QMessageBox.information(self, dlgTitle, strInfo)
-            web = False
+            self.is_web = False
         else:
-            web = True
-        return web
+            self.is_web = True
 
+    # ===================地图初始化======================
+    def __buildMap(self):
+        if self.is_web:
+            config = ConfigParser()
+            config.read("projectPath.ini", encoding='utf-8')
+            city = getCity()
+            self.cityInfo = city.getLocal()
+            gps_x = self.para[data['X']] * 0.00000899    # 经度转换米转换成gps坐标，误差很大   夸大了10倍
+            gps_y = self.para[data['Y']] * 0.00001141     # 以北纬38度为基准
+            if self.cityInfo[0] != None and self.cityInfo[1] != None:
+                self.map = baiduMap(self.ui.mapView,
+                                    "{0}".format(float(self.cityInfo[0]) + gps_x),
+                                    "{0}".format(float(self.cityInfo[1]) + gps_y)
+                                    )
+            else:
+                self.map = baiduMap(self.ui.mapView,
+                                    "{0}".format(float(config['mapconfig']["default_gps_x"])+gps_x),
+                                    "{0}".format(float(config['mapconfig']["default_gps_y"])+gps_y)
+                                    )
+
+            # 前两个是起始点，后两个为系统打开无人机的坐标
+            # 地图的线程
+            self.mapThread = MapQThread(rest=1, obj_ui=self)
+            self.mapThread.start()
+        else:
+            # 添加没有网时候的界面
+            baiduNotWeb(self.ui.mapView)     # 没有网络则加载 404
+            
+                 
     # ===================状态栏============================
     def __buildUI(self):
         font_size = QFont()
@@ -168,10 +180,21 @@ class QmyMainWindow(QMainWindow):
         self.LabAircraftInfo.setText(u"当前飞机状态：")
         self.ui.statusbar.addWidget(self.LabAircraftInfo)
         
+        self.__Lab = QLabel(self)
+        self.__Lab.setFont(font_size)
+        # self.__Lab.setMinimumWidth(300)
+        self.__Lab.setText(u"发送指令：")
+        self.ui.statusbar.addWidget(self.__Lab)
+
         self.__LabInfo = QLabel(self)
-        self.__LabInfo.setFont(font_size)
+        set_font = QFont()
+        set_font.setPointSize(15)
+        set_font.setFamily("微软雅黑")
+        set_font.setBold(True)
+        self.__LabInfo.setStyleSheet("color:red")
+        self.__LabInfo.setFont(set_font)
         self.__LabInfo.setMinimumWidth(300)
-        self.__LabInfo.setText(u"指令发送：")
+        self.__LabInfo.setText(u"")
         self.ui.statusbar.addWidget(self.__LabInfo)
 
         # 最右侧1050
@@ -180,6 +203,7 @@ class QmyMainWindow(QMainWindow):
 
         self.LabRightInfo.setText(u"")
         self.ui.statusbar.addPermanentWidget(self.LabRightInfo)
+    
 
     # ====================高度图等四个图============================
     def drawFigure(self):
@@ -233,12 +257,13 @@ class QmyMainWindow(QMainWindow):
         if result == QMessageBox.Yes:
             if self.key:
                 self.FigThread.closeThread = True
-                self.mapThread.closeThread = True
+                if self.is_web:    # 如果没网络，则地图服务不启动继而没有该对象
+                    self.mapThread.closeThread = True
                 time.sleep(0.6)
                 # 等待进入线程中关闭线程
                 self.get.closeShareMem()
                 print("关闭共享内存成功")
-                self.LabRightInfo.setText(u"关闭共享内存成功")
+                self.LabRightInfo.setText(u"关闭联合仿真成功")
             event.accept()
         else:
             event.ignore()
@@ -312,13 +337,23 @@ class QmyMainWindow(QMainWindow):
     def on_saveFigButton_clicked(self):
         buttonFunc.saveFigButton(self)
     
+    # 保存数据
+    @pyqtSlot()
     def on_saveConfButton_clicked(self):
+        print("on_saveConfButton_clicked")
         if self.beginRunTime:
             self.newRunTime = time.time()
             t = self.newRunTime - self.beginRunTime
             buttonFunc.saveConfButton(self, "%.2f" % t)
         else:
             self.LabRightInfo.setText(u"飞机尚未起飞！！！")
+    
+    @pyqtSlot()
+    def on_setParametersButton_clicked(self):
+        setParame = QsetParameters(self)
+        setParame.setAttribute(Qt.WA_DeleteOnClose)
+        setParame.show()
+
 
 
 #  =============自定义槽函数===============================
@@ -379,7 +414,7 @@ class QmyMainWindow(QMainWindow):
         for i, enum in enumerate(edit):
             func = getattr(self.ui, enum).setText
             func("%.2f" % self.para[i])
-    
+
     # 定制更新指示灯和界面数据
     def upLedState(self):
         # 显示数据
@@ -427,7 +462,7 @@ class QmyMainWindow(QMainWindow):
     def judgeOrder(self, state):
         for i in range(1, len(orderInfo)):
             if state == i:
-                self.__LabInfo.setText(u"发送指令:"+orderInfo[i])
+                self.__LabInfo.setText(orderInfo[i])
 
     def sendOrder(self, order):
         if self.ret == 0:
@@ -467,14 +502,14 @@ class QmyMainWindow(QMainWindow):
         self.ret = self.get.openShareMem()
         if self.ret == -1:
             print("打开内存失败！！！")
-            self.LabRightInfo.setText(u"打开内存失败！！！")
+            self.LabRightInfo.setText(u"启动联合仿真失败")
         elif self.ret == -2:
-            self.LabRightInfo.setText(u"指针指向失败！！！")
+            self.LabRightInfo.setText(u"启动联合仿真失败")
             print("指针指向失败！！！")
         else:
             self.ret = 0
             print("打开共享内存成功！！！")
-            self.LabRightInfo.setText(u"打开共享内存成功！！！")
+            self.LabRightInfo.setText(u"已启动联合仿真")
         return self.ret 
 
     def __ret(self):

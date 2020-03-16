@@ -8,7 +8,8 @@
 """
 
 import os
-import time
+import time  
+from mySetParameters import QsetParameters
 
 
 ModelTuple = ('no', 'programeControlModelLed', "remoteControlModelLed",
@@ -206,8 +207,7 @@ class buttonFunc(object):
         print("preStopButton is clicked")
         ui_obj.LabRightInfo.setText(u"预停按钮按下")
         retu = ui_obj.sendOrder("preStop")
-        if retu == 0: 
-            
+        if retu == 0:
             print("指令发送成功！！！")
 
     @staticmethod
@@ -215,7 +215,7 @@ class buttonFunc(object):
         print("parkingButton is clicked")
         ui_obj.LabRightInfo.setText(u"停车按钮按下")
         retu = ui_obj.sendOrder("parking")
-        if retu == 0: 
+        if retu == 0:
             
             print("指令发送成功！！！")
 
@@ -230,10 +230,11 @@ class buttonFunc(object):
         ui_obj.ui.phiView.fig.savefig("./curaeFile/" + new + "/" + "phi.png")
         ui_obj.ui.psiView.fig.savefig("./curaeFile/" + new + "/" + "psi.png")
         ui_obj.ui.threeDView.figure.savefig("./curaeFile/" + new + "/" + "threeDimensional.png")
-        ui_obj.LabRightInfo.setText(u"保存图像成功！！！")
+        ui_obj.LabRightInfo.setText(u"保存图像成功")
 
     @staticmethod
     def saveConfButton(ui_obj, t):
+        print("saveConfButton")
         new = time.strftime("%m_%d_%H_%M_%S", time.localtime())
         filePath = "./curaeFile/"
         if not os.path.isdir(filePath):
@@ -253,5 +254,10 @@ class buttonFunc(object):
             f.write(r"飞机状态各项参数为："+"\n")
             for i in data:
                 f.write("{:<4}".format('')+"{:<}".format(dataInfo[data[i]]) +
-                        "{:<}".format(i) + ":" + str(ui_obj.para[data[i]]) + "\n")
-        ui_obj.LabRightInfo.setText(u"保存参数成功！！！")
+                        "{:<}".format(i) + ":" + 
+                        "{:.2f}".format(ui_obj.para[data[i]]) + "\n")
+        ui_obj.LabRightInfo.setText(u"保存数据成功")
+    
+
+
+        

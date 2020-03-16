@@ -10,6 +10,12 @@
     <height>300</height>
    </rect>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>600</width>
+    <height>350</height>
+   </size>
+  </property>
   <property name="font">
    <font>
     <family>微软雅黑</family>
@@ -18,6 +24,10 @@
   </property>
   <property name="windowTitle">
    <string>参数设置</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="res.qrc">
+    <normaloff>:/icons/Img/settings_128px.ico</normaloff>:/icons/Img/settings_128px.ico</iconset>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>
@@ -51,15 +61,40 @@
        <property name="text">
         <string>爬升1俯仰角</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QDoubleSpinBox" name="setClimb1Theta"/>
+      <widget class="QDoubleSpinBox" name="setClimb1Theta">
+       <property name="wrapping">
+        <bool>false</bool>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="minimum">
+        <double>-1000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="stepType">
+        <enum>QAbstractSpinBox::DefaultStepType</enum>
+       </property>
+      </widget>
      </item>
      <item row="0" column="0">
       <widget class="QCheckBox" name="getAll">
        <property name="text">
         <string>全选</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -68,15 +103,40 @@
        <property name="text">
         <string>高度</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QDoubleSpinBox" name="setClimb2Theta"/>
+      <widget class="QDoubleSpinBox" name="setClimb2Theta">
+       <property name="wrapping">
+        <bool>false</bool>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="minimum">
+        <double>-1000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="stepType">
+        <enum>QAbstractSpinBox::DefaultStepType</enum>
+       </property>
+      </widget>
      </item>
      <item row="3" column="2">
       <widget class="QCheckBox" name="getTurnLeftPsi">
        <property name="text">
         <string>左转偏航角</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -85,6 +145,9 @@
        <property name="text">
         <string>下滑1俯仰角</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item row="3" column="0">
@@ -92,34 +155,138 @@
        <property name="text">
         <string>爬升2俯仰角</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item row="3" column="3">
-      <widget class="QDoubleSpinBox" name="setTurnLeftPsi"/>
+      <widget class="QDoubleSpinBox" name="setTurnLeftPsi">
+       <property name="wrapping">
+        <bool>false</bool>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="minimum">
+        <double>-1000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="stepType">
+        <enum>QAbstractSpinBox::DefaultStepType</enum>
+       </property>
+      </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QDoubleSpinBox" name="setDecline1Theta"/>
+      <widget class="QDoubleSpinBox" name="setDecline1Theta">
+       <property name="wrapping">
+        <bool>false</bool>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="minimum">
+        <double>-1000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="stepType">
+        <enum>QAbstractSpinBox::DefaultStepType</enum>
+       </property>
+      </widget>
      </item>
      <item row="5" column="0">
       <widget class="QCheckBox" name="getDecline2Theta">
        <property name="text">
         <string>下滑2俯仰角</string>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item row="4" column="3">
-      <widget class="QDoubleSpinBox" name="setTurnRightPsi"/>
+      <widget class="QDoubleSpinBox" name="setTurnRightPsi">
+       <property name="wrapping">
+        <bool>false</bool>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="minimum">
+        <double>-1000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="stepType">
+        <enum>QAbstractSpinBox::DefaultStepType</enum>
+       </property>
+      </widget>
      </item>
      <item row="5" column="1">
-      <widget class="QDoubleSpinBox" name="setDecline2Theta"/>
+      <widget class="QDoubleSpinBox" name="setDecline2Theta">
+       <property name="wrapping">
+        <bool>false</bool>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="minimum">
+        <double>-1000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="stepType">
+        <enum>QAbstractSpinBox::DefaultStepType</enum>
+       </property>
+      </widget>
      </item>
      <item row="1" column="3">
-      <widget class="QDoubleSpinBox" name="setHight"/>
+      <widget class="QDoubleSpinBox" name="setHight">
+       <property name="wrapping">
+        <bool>false</bool>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="minimum">
+        <double>-1000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="stepType">
+        <enum>QAbstractSpinBox::DefaultStepType</enum>
+       </property>
+      </widget>
      </item>
      <item row="4" column="2">
       <widget class="QCheckBox" name="getTurnRightPsi">
        <property name="text">
         <string>右转偏航角</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -222,6 +389,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
  <connections/>
 </ui>
