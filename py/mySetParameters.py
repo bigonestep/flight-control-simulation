@@ -61,8 +61,8 @@ class QsetParameters(QDialog):
 ##  ============自定义功能函数========================
 
     def savePrivData(self):
-        # 
-        for i in range(20, 27):
+        for i in range(data['sedClimb1Theta'], data['setTurnRightPsi']+1):
+
             self.parent_data.append(self.parent.para[i])
             print("parent.para:",self.parent_data)
     
