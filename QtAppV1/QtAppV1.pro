@@ -20,11 +20,13 @@ SOURCES += \
     MainRhapsody.cpp
 
 HEADERS += \
-    MainRhapsody.h
+    MainRhapsody.h \
+    SetParameters.h
 
 FORMS += \
     MainRhapsody.ui \
-    MainWelcome.ui
+    MainWelcome.ui \
+    SetParameters.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

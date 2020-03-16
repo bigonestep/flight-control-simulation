@@ -1,3 +1,10 @@
+""" 
+* @Author: Wang.Zhihui  
+* @Date: 2020-03-16 16:19:13  
+* @Last Modified by:   Wang.Zhihui  
+* @Last Modified time: 2020-03-16 16:19:13  
+* @function: 
+"""
 import sys, os, requests
 from PyQt5 import QtWidgets, QtCore, QtGui
 from configparser import ConfigParser

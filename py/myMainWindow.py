@@ -389,11 +389,11 @@ class QmyMainWindow(QMainWindow):
         self.updataEngineState()
 
     def updateTime(self):
-            self.ui.heightView.t = linspace(self.T, self.T + 10,  len(self.H.queueList))
-            self.ui.thetaView.t = linspace(self.T, self.T + 10, len(self.theta.queueList))
-            self.ui.phiView.t = linspace(self.T, self.T + 10, len(self.phi.queueList))
-            self.ui.psiView.t = linspace(self.T, self.T + 10, len(self.psi.queueList))
-            self.T += 0.1
+        self.ui.heightView.t = linspace(self.T, self.T + 10, len(self.H.queueList))
+        self.ui.thetaView.t = linspace(self.T, self.T + 10, len(self.theta.queueList))
+        self.ui.phiView.t = linspace(self.T, self.T + 10, len(self.phi.queueList))
+        self.ui.psiView.t = linspace(self.T, self.T + 10, len(self.psi.queueList))
+        self.T += 0.1
 
     def updataMap(self):
         # =============地图更新=====================
