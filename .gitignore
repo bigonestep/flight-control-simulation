@@ -1,7 +1,7 @@
 /py/Curae_File
 /py/.idea
 /py/.vscode
-/py/__pycache__
+/py/__pycache__/
 /.idea
 /.vscode
 *.zip
