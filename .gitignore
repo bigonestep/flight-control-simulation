@@ -6,3 +6,4 @@
 /.vscode
 *.zip
 *.exe
+__pycache__
