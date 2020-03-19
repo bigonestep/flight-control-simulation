@@ -9,15 +9,11 @@
 
 from requests import get, exceptions
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets, QUrl
 
 from configparser import ConfigParser
 
 from PyQt5.QtWidgets import QVBoxLayout
-
-# from PyQt5.QtGui import *
-
-from PyQt5.QtCore import QUrl
 
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 

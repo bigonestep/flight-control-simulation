@@ -1,3 +1,10 @@
+""" 
+* @Author: Wang.Zhihui
+* @Date: 2020-03-19 22:11:06
+* @Last Modified by: Wang.Zhihui
+* @Last Modified time: 2020-03-19 22:11:06
+* @function: 欢迎界面
+"""
 # -*-coding:utf-8-*-
 # cython: language_level=3
 from time import sleep
@@ -17,7 +24,7 @@ class SplashPanel(QSplashScreen):
         self.setPixmap(pixmap)
         # self.showMessage('正在加载文件资源', alignment=Qt.AlignBottom, color=Qt.black)
         self.show()
-        for i in range(1, 6):
+        for i in range(1, 5):
             self.showMessage('正在加载文件资源{}'.format('.' * i), alignment=Qt.AlignBottom, color=Qt.black)
             sleep(0.5)
     def mousePressEvent(self, evt):

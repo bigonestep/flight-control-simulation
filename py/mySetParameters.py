@@ -10,19 +10,9 @@
 import sys
 
 from PyQt5.QtWidgets import  QApplication, QDialog, QMessageBox
-
 from PyQt5.QtCore import  pyqtSlot, pyqtSignal,Qt, QCoreApplication
-
-##from PyQt5.QtWidgets import
-
-##from PyQt5.QtGui import
-
-##from PyQt5.QtSql import
-
-##from PyQt5.QtMultimedia import
-
-##from PyQt5.QtMultimediaWidgets import
-from conf import (data) 
+from conf import data
+from configparser import ConfigParser
 from ui_SetParameters import Ui_setParameter
 
 paramsCheckBox = (
@@ -48,7 +38,7 @@ class QsetParameters(QDialog):
         self.parent = parent
         self.parent_data = []
         # self.savePrivData()     # 保存原始数据
-        # self.showPrivData()
+        self.showPrivData()
         
         # 确定键关联槽函数
         self.ui.btnOK.clicked.connect(self.ok_button)
@@ -66,9 +56,11 @@ class QsetParameters(QDialog):
             
     
     # 初始化原始的数据
-    # def showPrivData(self):
-    #     for i in range(len(paramsSpinBox)):
-    #         getattr(self.ui, paramsSpinBox[i]).setValue(self.parent_data[i])
+    def showPrivData(self):
+        config = ConfigParser()
+        config.read("projectPath.ini", encoding='utf-8')
+        for i in range(len(paramsSpinBox)):
+            getattr(self.ui, paramsSpinBox[i]).setValue(float(config["parameters"][setParamTable[i]]))
 
     # 全选
     @pyqtSlot()
@@ -87,7 +79,7 @@ class QsetParameters(QDialog):
             if getattr(self.ui,paramsCheckBox[i]).isChecked():
                 self.parent.get.readOrWriteData(setParamTable[i], 'w', 
                                                 getattr(self.ui,paramsSpinBox[i]).value())
-                self.parent_data[i] = getattr(self.ui,paramsSpinBox[i]).value()
+                
         print("self.parent_data:",self.parent_data)
         dlgTitle = u"消息"                # 弹出警告窗
         strInfo = u"发送参数成功"

@@ -1317,7 +1317,7 @@ class Ui_MainRhapsody(object):
         self.parkingButton.setText(_translate("MainRhapsody", "停车"))
         self.a10.setTitle(_translate("MainRhapsody", "参数信息"))
         self.setParametersButton.setText(_translate("MainRhapsody", "参数装订"))
-        self.zeroingButton.setText(_translate("MainRhapsody", "数据归零"))
+        self.zeroingButton.setText(_translate("MainRhapsody", "重新加载"))
         self.saveConfButton.setText(_translate("MainRhapsody", "保存数据"))
         self.saveFigButton.setText(_translate("MainRhapsody", "保存图像"))
         self.b1.setTitle(_translate("MainRhapsody", "三维航迹"))

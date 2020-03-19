@@ -2248,7 +2248,7 @@
             </font>
            </property>
            <property name="text">
-            <string>数据归零</string>
+            <string>重新加载</string>
            </property>
           </widget>
          </item>

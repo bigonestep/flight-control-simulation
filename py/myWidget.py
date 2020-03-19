@@ -7,16 +7,20 @@
 * @function: 主界面
 """
 
-import sys, os, time
-import win32con
-import win32gui
-import win32process
-import subprocess
+import sys
+from time import sleep
+from os import path
+from win32con import KEYEVENTF_KEYUP
+from win32gui import (GetWindowText, SetForegroundWindow, 
+                      IsWindowVisible, IsWindowEnabled,
+                      EnumWindows)
+from win32process import GetWindowThreadProcessId
+from subprocess import Popen
 from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox, QMainWindow, QFileDialog
 from PyQt5.QtGui import QPainter, QPixmap, QFont
 from PyQt5.QtCore import (pyqtSlot, pyqtSignal, Qt, QDir, 
                           QCoreApplication, QT_VERSION_STR)
-import win32api
+from win32api import ShellExecute, keybd_event
 from multiprocessing import Process, freeze_support
 
 from myMainWindow import QmyMainWindow
@@ -111,10 +115,10 @@ class QmyWidget(QMainWindow):
          若不存在则调用打开文件窗口，选择程序打开,若选择的不是指定软件，则弹出警告窗口。需要重新选择
          以下三个按键都一个逻辑
         """
-        if os.path.isfile(self.pycharmPath) and os.path.isdir(self.pyProjectPath):
+        if path.isfile(self.pycharmPath) and path.isdir(self.pyProjectPath):
 
             if "pycharm" in self.pycharmPath.lower():
-                win32api.ShellExecute(0, 'open', self.pycharmPath, self.pyProjectPath, '', 1)
+                ShellExecute(0, 'open', self.pycharmPath, self.pyProjectPath, '', 1)
                 # 其中前两个为固定，第三个为打开软件的路径，
                 # 第四个是使用该软件打开该文件（或文件夹）
                 # 若没有则放空字符 ''
@@ -125,7 +129,7 @@ class QmyWidget(QMainWindow):
             filt = u"执行程序(*.exe);;所有文件(*.*)"
             filename, _ = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
             if "pycharm" in filename.lower():
-                win32api.ShellExecute(0, 'open', filename, '', '', 1)
+                ShellExecute(0, 'open', filename, '', '', 1)
             elif filename == '':
                 pass
             else:
@@ -135,20 +139,17 @@ class QmyWidget(QMainWindow):
 
     @pyqtSlot()
     def on_matlabButton_clicked(self):
-        # print("matlab")
-        if os.path.isfile(self.matlabPath):
-            # print("os.path.isfile(self.matlabPath)")
+        if path.isfile(self.matlabPath):
             if "matlab" in self.matlabPath.lower():
-                # print("")
-                win32api.ShellExecute(0, 'open', self.matlabPath,'', '', 1)
-                # print("打开matlab成功！！！")
+                ShellExecute(0, 'open', self.matlabPath,'', '', 1)
+                
         else:
             curPath = QDir.currentPath()
             dlgTitle = u"打开MatLab软件"
             filt = u"执行程序(*.exe);;所有文件(*.*)"
             filename, _ = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
             if "matlab" in filename.lower():
-                win32api.ShellExecute(0, 'open', filename, '', '', 1)
+                ShellExecute(0, 'open', filename, '', '', 1)
             elif filename == '':
                 pass
             else:
@@ -156,37 +157,17 @@ class QmyWidget(QMainWindow):
                 strInfo = u"请打开MatLab程序"
                 QMessageBox.critical(self, dlgTitle, strInfo)
 
-    # @pyqtSlot()
-    # def on_RhapsodyButton_clicked(self):
-    #     if os.path.isfile(self.RhapsodyPath) and os.path.isfile(self.RhapsodyProjectPath):
-    #         if "rhapsody" in self.RhapsodyPath.lower() and '.rpy' in self.RhapsodyProjectPath:
-    #             win32api.ShellExecute(0, 'open', self.RhapsodyPath, self.RhapsodyProjectPath, '', 1)
-    #             # print("打开rhapsody成功！！！")
-    #     else:
-    #         curPath = QDir.currentPath()
-    #         dlgTitle = u"打开Rhapsody软件"
-    #         filt = u"执行程序(*.exe);;所有文件(*.*)"
-    #         filename, _ = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
-    #         if "rhapsody" in filename.lower():
-    #             # os.system('"'+filename+'"')
-    #             win32api.ShellExecute(0, 'open', filename, "", '', 1)
-    #         elif filename == '':
-    #             pass
-    #         else:
-    #             dlgTitle = u"打开错误"
-    #             strInfo = u"请打开Rhapsody程序"
-    #             QMessageBox.critical(self, dlgTitle, strInfo)
 
     @pyqtSlot()
     def on_flightButton_clicked(self):
         # 项目打开成功了，然后打开主面板
-        mainWindow = MainWindow()
+        mainWindow = MainWindow("flightButton", None)
         mainWindow.start()
-        time.sleep(5)
+        sleep(5)
         # 打开控制界面的槽函数
-        if os.path.isfile(self.RhapsodyProjectExePath):
+        if path.isfile(self.RhapsodyProjectExePath):
             if  '.exe' in self.RhapsodyProjectExePath:
-                win32api.ShellExecute(0, 'open', self.RhapsodyProjectExePath, "", '', 1)
+                ShellExecute(0, 'open', self.RhapsodyProjectExePath, "", '', 1)
                 # print("打开rhapsody成功！！！")
         else:
             curPath = QDir.currentPath()
@@ -194,8 +175,7 @@ class QmyWidget(QMainWindow):
             filt = u"执行程序(*.exe);;所有文件(*.*)"
             filename, _ = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
             if ".exe" in filename.lower():
-                # os.system('"'+filename+'"')
-                win32api.ShellExecute(0, 'open', filename, "", '', 1)
+                ShellExecute(0, 'open', filename, "", '', 1)
                 
             elif filename == '':
                 pass
@@ -210,10 +190,10 @@ class QmyWidget(QMainWindow):
     def on_mainSystemButton_clicked(self):
         # 打开主面板
         # 打开rhapsody软件
-        if os.path.isfile(self.RhapsodyPath) and os.path.isfile(self.RhapsodyProjectPath):
+        if path.isfile(self.RhapsodyPath) and path.isfile(self.RhapsodyProjectPath):
             if "rhapsody" in self.RhapsodyPath.lower() and '.rpy' in self.RhapsodyProjectPath:
                 # win32api.ShellExecute(0, 'open', self.RhapsodyPath, self.RhapsodyProjectPath, '', 1)
-                Rhapsody = subprocess.Popen([self.RhapsodyPath])
+                Rhapsody = Popen([self.RhapsodyPath, self.RhapsodyProjectPath])
                 print(Rhapsody)
                 # print("打开rhapsody成功！！！")
         else:
@@ -222,21 +202,19 @@ class QmyWidget(QMainWindow):
             filt = u"执行程序(*.exe);;所有文件(*.*)"
             filename, _ = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
             if "sublime_text" in filename.lower():
-                # os.system('"'+filename+'"')
-                # win32api.ShellExecute(0, 'open', filename, "", '', 1)
-                Rhapsody = subprocess.Popen([filename])
+                Rhapsody = Popen([filename])
             elif filename == '':
                 pass
             else:
                 dlgTitle = u"打开错误"
                 strInfo = u"请打开Rhapsody程序"
                 QMessageBox.critical(self, dlgTitle, strInfo)
-        time.sleep(self.openRhapsodyTime)   # 5秒
+        sleep(self.openRhapsodyTime)   # 5秒
 
         #打开工程编译的.exe文件
-        if os.path.isfile(self.RhapsodyProjectExePath):
+        if path.isfile(self.RhapsodyProjectExePath):
             if  '.exe' in self.RhapsodyProjectExePath:
-                win32api.ShellExecute(0, 'open', self.RhapsodyProjectExePath, "", '', 1)
+                ShellExecute(0, 'open', self.RhapsodyProjectExePath, "", '', 1)
                 # print("打开rhapsody成功！！！")
         else:
             curPath = QDir.currentPath()
@@ -244,8 +222,7 @@ class QmyWidget(QMainWindow):
             filt = u"执行程序(*.exe);;所有文件(*.*)"
             filename, _ = QFileDialog.getOpenFileName(self, dlgTitle, curPath, filt)
             if ".exe" in filename.lower():
-                # os.system('"'+filename+'"')
-                win32api.ShellExecute(0, 'open', filename, "", '', 1)
+                ShellExecute(0, 'open', filename, "", '', 1)
                 
             elif filename == '':
                 pass
@@ -253,37 +230,41 @@ class QmyWidget(QMainWindow):
                 dlgTitle = u"打开错误"
                 strInfo = u"打开Rhapsody项目编译之后可执行文件"
                 QMessageBox.critical(self, dlgTitle, strInfo)
-        time.sleep(self.openRhapsodyExeTime)  # 这个时间是等待Rhapsody加载工程
+        sleep(self.openRhapsodyExeTime)  # 这个时间是等待Rhapsody加载工程
         # TODO: 模拟键盘发送一个F4, 问题怎么把软件的焦点防御rhapsody
         # 先获取焦点
+        hand = None
         try:
             for hwnd in get_hwnds_for_pid(Rhapsody.pid):
-                print(hwnd, "=>", win32gui.GetWindowText (hwnd))
-                win32api.keybd_event(13,0,0,0)
-                win32gui.SetForegroundWindow(hwnd)
-                time.sleep(0.1)
+                print(hwnd, "=>", GetWindowText (hwnd))
+                keybd_event(13,0,0,0)
+                hand = hwnd
+                SetForegroundWindow(hwnd)
+                sleep(0.1)
                 # 按下快捷键
-                win32api.keybd_event(115,0,0,0)  #F4键位码是115
-                time.sleep(0.01)
-                win32api.keybd_event(115,0,win32con.KEYEVENTF_KEYUP,0) #释放按键115
+                keybd_event(115,0,0,0)  #F4键位码是115
+                sleep(0.01)
+                keybd_event(115,0,KEYEVENTF_KEYUP,0) #释放按键115
                 break
         except UnboundLocalError:
             dlgTitle = u"打开错误"
             strInfo = u"打开Rhapsody程序打开错误"
             QMessageBox.critical(self, dlgTitle, strInfo)
-        time.sleep(0.5)
-        mainWindow = MainWindow()
+        sleep(0.5)
+        mainWindow = MainWindow("mainSystemButton", hand )
         mainWindow.start()
         
 
 class MainWindow(Process):
-    def __init__(self):
+    def __init__(self, flog, hand):
         Process.__init__(self)
+        self.flog = flog
+        self.hand = hand
 
     def run(self):
         QApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
         mainapp = QApplication(sys.argv)  # 创建GUI应用程序
-        mainform = QmyMainWindow()  # 创建窗体
+        mainform = QmyMainWindow(self.flog, self.hand)  # 创建窗体
         mainform.show()
 
         sys.exit(mainapp.exec_())
@@ -292,13 +273,13 @@ class MainWindow(Process):
 # 查找PID号
 def get_hwnds_for_pid (pid):
     def callback (hwnd, hwnds):
-        if win32gui.IsWindowVisible (hwnd) and win32gui.IsWindowEnabled (hwnd):
-            _, found_pid = win32process.GetWindowThreadProcessId (hwnd)
+        if IsWindowVisible (hwnd) and IsWindowEnabled (hwnd):
+            _, found_pid = GetWindowThreadProcessId (hwnd)
             if found_pid == pid:
                 hwnds.append (hwnd)
             return True
     hwnds = []
-    win32gui.EnumWindows (callback, hwnds)
+    EnumWindows (callback, hwnds)
     return hwnds
 
 

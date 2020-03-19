@@ -7,8 +7,8 @@
 * @function: 按键的逻辑功能
 """
 
-import os
-import time  
+from os import path, makedirs
+from time import strftime, localtime
 from mySetParameters import QsetParameters
 
 
@@ -221,10 +221,10 @@ class buttonFunc(object):
 
     @staticmethod
     def saveFigButton(ui_obj):
-        new = time.strftime("%m_%d_%H_%M_%S", time.localtime())
+        new = strftime("%m_%d_%H_%M_%S", localtime())
         filePath = "./Curae_File/"+new+"/"
-        if not os.path.isdir(filePath):
-            os.makedirs(filePath)
+        if not path.isdir(filePath):
+            makedirs(filePath)
         ui_obj.ui.heightView.fig.savefig("./Curae_File/"+new+"/"+"Height.png")
         ui_obj.ui.thetaView.fig.savefig("./Curae_File/" + new + "/" + "theta.png")
         ui_obj.ui.phiView.fig.savefig("./Curae_File/" + new + "/" + "phi.png")
@@ -235,10 +235,10 @@ class buttonFunc(object):
     @staticmethod
     def saveConfButton(ui_obj, t):
         print("saveConfButton")
-        new = time.strftime("%m_%d_%H_%M_%S", time.localtime())
+        new = strftime("%m_%d_%H_%M_%S", localtime())
         filePath = "./Curae_File/"
-        if not os.path.isdir(filePath):
-            os.makedirs(filePath)
+        if not path.isdir(filePath):
+            makedirs(filePath)
         textPath = filePath + new+"AircraftParameters"+".txt"
         tt = "{:<}".format("飞行持续时间为"+":"+t+"\n")
         model = "{:<}".format("飞机飞行模式为")+":" + ModelInfo[ui_obj.ledModelState] + "\n"
