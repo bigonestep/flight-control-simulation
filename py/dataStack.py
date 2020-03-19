@@ -57,14 +57,11 @@ class queue(object):
             self.newNum = 0
             self.allNum = 0
 
-    # def threeDDataUpdata(self, newListLen):
-    #     if self.len() > newListLen:
-    #         q = self.queueList[-newListLen:]
-    #         num = self.len() - len(q)
-    #         del self.queueList
-    #         self.queueList = [0] * num
-    #         self.queueList.extend(q)
-    #         print(len(self.queueList))
+    def zeroingData(self, newListLen):
+        if self.len() > newListLen:
+            self.queueList = [0.0] * newListLen
+            self.newNum = 0
+            self.allNum = 0  
 
 
 

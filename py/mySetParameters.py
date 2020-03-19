@@ -35,7 +35,7 @@ paramsSpinBox = (
 )
 
 setParamTable = (
-    'sedClimb1Theta', 'setClimb2Theta', 'setDecline1Theta', 
+    'setClimb1Theta', 'setClimb2Theta', 'setDecline1Theta', 
     'setDecline2Theta', 'setHight', 'setTurnLeftPsi',
     'setTurnRightPsi'
 )
@@ -47,8 +47,8 @@ class QsetParameters(QDialog):
         self.ui.setupUi(self)      # 构造UI界面
         self.parent = parent
         self.parent_data = []
-        self.savePrivData()     # 保存原始数据
-        self.showPrivData()
+        # self.savePrivData()     # 保存原始数据
+        # self.showPrivData()
         
         # 确定键关联槽函数
         self.ui.btnOK.clicked.connect(self.ok_button)
@@ -60,16 +60,15 @@ class QsetParameters(QDialog):
         self.ui.getAll.stateChanged.connect(self.on_getAll_clicked)
 ##  ============自定义功能函数========================
 
-    def savePrivData(self):
-        for i in range(data['sedClimb1Theta'], data['setTurnRightPsi']+1):
-
-            self.parent_data.append(self.parent.para[i])
-            print("parent.para:",self.parent_data)
+    # def savePrivData(self):
+    #     for i in range(data['setClimb1Theta'], data['setTurnRightPsi']+1):
+    #         self.parent_data.append(self.parent.para[i])
+            
     
     # 初始化原始的数据
-    def showPrivData(self):
-        for i in range(len(paramsSpinBox)):
-            getattr(self.ui, paramsSpinBox[i]).setValue(self.parent_data[i])
+    # def showPrivData(self):
+    #     for i in range(len(paramsSpinBox)):
+    #         getattr(self.ui, paramsSpinBox[i]).setValue(self.parent_data[i])
 
     # 全选
     @pyqtSlot()
@@ -89,6 +88,7 @@ class QsetParameters(QDialog):
                 self.parent.get.readOrWriteData(setParamTable[i], 'w', 
                                                 getattr(self.ui,paramsSpinBox[i]).value())
                 self.parent_data[i] = getattr(self.ui,paramsSpinBox[i]).value()
+        print("self.parent_data:",self.parent_data)
         dlgTitle = u"消息"                # 弹出警告窗
         strInfo = u"发送参数成功"
         QMessageBox.information(self, dlgTitle, strInfo)
@@ -98,7 +98,12 @@ class QsetParameters(QDialog):
     # 重置键重置数据
     @pyqtSlot()
     def reset_button(self):
-        self.showPrivData()
+        # self.showPrivData()
+        for i in range(len(paramsSpinBox)):
+            getattr(self.ui, paramsSpinBox[i]).setValue(0.0)
+
+        
+        
 
 
 

@@ -17,7 +17,7 @@ data = {
     # 'acceptState':13, 'programeControlState':14, 'send': 15
     'acceptFlightStatus': 13, 'acceptModel': 14, 'acceptEngineStatus': 15,
     'send': 16,
-    'sedClimb1Theta': 20, 'setClimb2Theta': 21, 'setDecline1Theta': 22, 
+    'setClimb1Theta': 20, 'setClimb2Theta': 21, 'setDecline1Theta': 22, 
     'setDecline2Theta': 23, 'setHight': 24, 'setTurnLeftPsi':25,
     'setTurnRightPsi':26
 }

@@ -28,8 +28,9 @@ class baiduMap(object):
         self.mapView = mapView
         self.x = x
         self.y = y
-        self.baiduBrowser()
         self.getUrl()
+        self.baiduBrowser()
+        self.openURL()
 
     def getUrl(self):
         config = ConfigParser()
@@ -66,7 +67,7 @@ class baiduMap(object):
         // var pointX = 114.34144592;
         // var pointY = 34.79705048;
 
-        function init(){
+        function init(x, y){
             pointX = pointX
             pointY = pointY
         }
@@ -92,6 +93,17 @@ class baiduMap(object):
                  })();
             }
         }
+        function showInfo(thisMarker,point) {
+            //获取点的信息
+            var sContent = 
+            '<ul style="margin:0 0 5px 0;padding:0.2em 0">'  
+            +'<li style="line-height: 26px;font-size: 15px;">'  
+            +'<span style="width: 50px;display: inline-block;">经度：</span>' + point.lng.toFixed(5) + '</li>'  
+            +'<span style="width: 50px;display: inline-block;">维度：</span>' + point.lat.toFixed(5) + '</li>' 
+            +'</ul>';
+            var infoWindow = new BMap.InfoWindow(sContent); //创建信息窗口对象
+            thisMarker.openInfoWindow(infoWindow); //图片加载完后重绘infoWindow
+        }
 
         //添加线  
         function addLine(points){  
@@ -115,7 +127,7 @@ class baiduMap(object):
             var lat = pointY+y;
 
 
-            var point = {"lng":lng,"lat":lat,"status":1,"id":15}  // 设置点
+            var point = {"lng":lng,"lat":lat,"status":1}  // 设置点
             var makerPoints = [];  
             var newLinePoints = [];  
             var len;  
@@ -165,6 +177,7 @@ class baiduMap(object):
         vv.addWidget(self.browser)
         self.mapView.setLayout(vv)
         # 指定打开界面的 URL
+    def openURL(self):
         url = r"file:///./map.html"
         self.browser.setUrl(QUrl(url))
         jsFunction = "init({0}, {1});".format(self.x, self.y)

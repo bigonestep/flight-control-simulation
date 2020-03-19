@@ -10,10 +10,10 @@ from os import system
 import sys
 import time
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel, QMessageBox,
-                             QInputDialog, QLineEdit)
+                             QInputDialog, QLineEdit, QSplashScreen)
 from PyQt5.QtCore import (pyqtSlot, pyqtSignal, QTimer, QMargins, QCoreApplication,
                           Qt, QT_VERSION_STR, QVersionNumber, QMutex)
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QPixmap
 from numpy import linspace 
 import matplotlib.image as img
 from ui_MainRhapsody import Ui_MainRhapsody
@@ -30,6 +30,25 @@ from updataQTread import FigQThread, MapQThread
 from map import baiduMap, getCity, baiduNotWeb 
 from configparser import ConfigParser
 from mySetParameters import QsetParameters
+from splashPanel import SplashPanel
+
+
+
+
+# TODO: 加一个清除键 0-27数据清零  参数装订清零     ok
+# 默认值       ok
+# 显示保存路径  ok
+# 安装软件和安装的库文档
+# 界面设计和注释         
+# TAG: 加符号 暂时不加
+# 飞行仿真 放第五个    ok
+# 打开后端时，需要关闭后端    
+# 优化打开前后端逻辑   ok
+# TODO: 对比修改   ok
+# 关闭 主界面要关闭黑框      现在先不管
+# 实验室logo               ok
+# 参数左移                  ok
+# 联合仿真改成  打开软件和界面，  飞行仿真只有前后端  去掉控制逻辑  ok
 
 
 class QmyMainWindow(QMainWindow): 
@@ -41,7 +60,7 @@ class QmyMainWindow(QMainWindow):
         self.ui.splitter.setStretchFactor(0, 2)
         self.ui.splitter.setStretchFactor(0, 5)
         self.setCentralWidget(self.ui.splitter)
-
+        
         # 记录上一个状态是否为stop状态
         self.stopState = False
         # ==================添加状态栏========================
@@ -346,13 +365,34 @@ class QmyMainWindow(QMainWindow):
             t = self.newRunTime - self.beginRunTime
             buttonFunc.saveConfButton(self, "%.2f" % t)
         else:
-            self.LabRightInfo.setText(u"飞机尚未起飞！！！")
+            self.LabRightInfo.setText(u"飞机尚未起飞")
     
     @pyqtSlot()
     def on_setParametersButton_clicked(self):
+        
         setParame = QsetParameters(self)
         setParame.setAttribute(Qt.WA_DeleteOnClose)
-        setParame.show()
+        # self.setParame.show()
+        setParame.exec()
+            
+            
+    
+    @pyqtSlot()
+    def on_zeroingButton_clicked(self):
+        # queue
+        n = 2
+        tempList = [self.X, self.Y, self.H, self.psi, self.phi, self.theta]
+        for i in tempList:
+            getattr(i, "zeroingData")(n)    # 反射     Y-theta都为零
+        self.updateTime()
+        for i in range(0, len(data)):      # 内存中的数也都为零
+            self.para[i] = 0.0
+        if self.is_web:                    # 重新加载地图
+            self.map.openURL()
+
+        
+
+
 
 
 
@@ -540,7 +580,17 @@ if __name__ == "__main__":
         pointSize = font.pointSize()
         font.setPixelSize(pointSize*90/72)
         app.setFont(font)
+
+    # splash = QSplashScreen(QPixmap('./map/1.png'))
+    splash = SplashPanel()
+    splash.show()
+    app.processEvents()  # 防止进程卡死
+
     myMainWin = QmyMainWindow()
     myMainWin.show()
+
+    splash.finish(myMainWin)  # 关闭欢迎界面
+    splash.deleteLater()
+
     sys.exit(app.exec())
 

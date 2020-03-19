@@ -222,21 +222,21 @@ class buttonFunc(object):
     @staticmethod
     def saveFigButton(ui_obj):
         new = time.strftime("%m_%d_%H_%M_%S", time.localtime())
-        filePath = "./curaeFile/"+new+"/"
+        filePath = "./Curae_File/"+new+"/"
         if not os.path.isdir(filePath):
             os.makedirs(filePath)
-        ui_obj.ui.heightView.fig.savefig("./curaeFile/"+new+"/"+"Height.png")
-        ui_obj.ui.thetaView.fig.savefig("./curaeFile/" + new + "/" + "theta.png")
-        ui_obj.ui.phiView.fig.savefig("./curaeFile/" + new + "/" + "phi.png")
-        ui_obj.ui.psiView.fig.savefig("./curaeFile/" + new + "/" + "psi.png")
-        ui_obj.ui.threeDView.figure.savefig("./curaeFile/" + new + "/" + "threeDimensional.png")
-        ui_obj.LabRightInfo.setText(u"保存图像成功")
+        ui_obj.ui.heightView.fig.savefig("./Curae_File/"+new+"/"+"Height.png")
+        ui_obj.ui.thetaView.fig.savefig("./Curae_File/" + new + "/" + "theta.png")
+        ui_obj.ui.phiView.fig.savefig("./Curae_File/" + new + "/" + "phi.png")
+        ui_obj.ui.psiView.fig.savefig("./Curae_File/" + new + "/" + "psi.png")
+        ui_obj.ui.threeDView.figure.savefig("./Curae_File/" + new + "/" + "threeDimensional.png")
+        ui_obj.LabRightInfo.setText(u"保存图像于Curae_File文件夹：成功")
 
     @staticmethod
     def saveConfButton(ui_obj, t):
         print("saveConfButton")
         new = time.strftime("%m_%d_%H_%M_%S", time.localtime())
-        filePath = "./curaeFile/"
+        filePath = "./Curae_File/"
         if not os.path.isdir(filePath):
             os.makedirs(filePath)
         textPath = filePath + new+"AircraftParameters"+".txt"
@@ -256,7 +256,7 @@ class buttonFunc(object):
                 f.write("{:<4}".format('')+"{:<}".format(dataInfo[data[i]]) +
                         "{:<}".format(i) + ":" + 
                         "{:.2f}".format(ui_obj.para[data[i]]) + "\n")
-        ui_obj.LabRightInfo.setText(u"保存数据成功")
+        ui_obj.LabRightInfo.setText(u"保存数据于Curae_File文件夹：成功")
     
 
 

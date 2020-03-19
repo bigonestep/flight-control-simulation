@@ -12,5 +12,6 @@
         <file>Img/loc.png</file>
         <file>Img/a128.ico</file>
         <file>Img/settings_128px.ico</file>
+        <file>Img/飞行仿真.png</file>
     </qresource>
 </RCC>
